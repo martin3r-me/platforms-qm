@@ -147,6 +147,13 @@ class QmOverviewTool implements ToolContract, ToolMetadataContract
                         'stats' => 'qm.stats.GET',
                         'export' => 'qm.export.GET',
                     ],
+                    'schedule' => [
+                        'recurrence' => 'qm.instances.schedule.PUT',
+                    ],
+                ],
+                'artisan_commands' => [
+                    'qm:process-recurrences' => 'Verarbeitet wiederkehrende Checklisten (laeuft stuendlich)',
+                    'qm:process-escalations' => 'Prueft und eskaliert offene Abweichungen (laeuft alle 15 Min)',
                 ],
             ]);
         } catch (\Throwable $e) {

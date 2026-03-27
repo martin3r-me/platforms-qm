@@ -2,6 +2,7 @@
 
 namespace Platform\Qm;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -67,6 +68,23 @@ class QmServiceProvider extends ServiceProvider
 
         // Step 7: Tools
         $this->registerTools();
+
+        // Step 8: Commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Platform\Qm\Console\ProcessRecurrencesCommand::class,
+                \Platform\Qm\Console\ProcessEscalationsCommand::class,
+            ]);
+        }
+
+        // Step 9: Schedule
+        $this->app->booted(function () {
+            if ($this->app->bound(Schedule::class)) {
+                $schedule = $this->app->make(Schedule::class);
+                $schedule->command('qm:process-recurrences')->hourly();
+                $schedule->command('qm:process-escalations')->everyFifteenMinutes();
+            }
+        });
     }
 
     protected function registerTools(): void
@@ -125,6 +143,9 @@ class QmServiceProvider extends ServiceProvider
             // Analytics
             $registry->register(new \Platform\Qm\Tools\QmStatsTool());
             $registry->register(new \Platform\Qm\Tools\QmExportTool());
+
+            // Schedule
+            $registry->register(new \Platform\Qm\Tools\ScheduleTool());
         } catch (\Throwable $e) {
             \Log::warning('QM: Tool-Registrierung fehlgeschlagen', ['error' => $e->getMessage()]);
         }
