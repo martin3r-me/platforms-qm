@@ -37,15 +37,20 @@ return [
                     'route' => 'qm.templates.index',
                     'icon' => 'heroicon-o-document-duplicate',
                 ],
-                'instances' => [
-                    'title' => 'Checklisten',
-                    'route' => 'qm.instances.index',
-                    'icon' => 'heroicon-o-clipboard-document-list',
+                'sections' => [
+                    'title' => 'Sektionen',
+                    'route' => 'qm.sections.index',
+                    'icon' => 'heroicon-o-rectangle-group',
                 ],
-                'deviations' => [
-                    'title' => 'Abweichungen',
-                    'route' => 'qm.deviations.index',
-                    'icon' => 'heroicon-o-exclamation-triangle',
+                'field-definitions' => [
+                    'title' => 'Feld-Definitionen',
+                    'route' => 'qm.field-definitions.index',
+                    'icon' => 'heroicon-o-adjustments-horizontal',
+                ],
+                'field-types' => [
+                    'title' => 'Feldtypen',
+                    'route' => 'qm.field-types.index',
+                    'icon' => 'heroicon-o-cube',
                 ],
             ],
         ],

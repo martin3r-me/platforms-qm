@@ -130,28 +130,65 @@
                         <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
                             <div class="d-flex items-center gap-2">
                                 @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-muted)]')
-                                <span class="text-xs text-[var(--ui-muted)]">Abweichungen (offen)</span>
+                                <span class="text-xs text-[var(--ui-muted)]">Abweichungen</span>
                             </div>
                             <span class="text-sm font-bold {{ $stats['deviations_open'] > 0 ? 'text-red-500' : 'text-[var(--ui-secondary)]' }}">{{ $stats['deviations_open'] }}</span>
                         </div>
                     </div>
                 </div>
 
-                {{-- Schnellzugriff --}}
+                {{-- Navigation --}}
                 <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Hierarchie</h3>
-                    <div class="space-y-1.5 text-[11px] text-[var(--ui-muted)]">
-                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="font-semibold text-[var(--ui-secondary)]">Feldtypen</span> &rarr; Feld-Definitionen
+                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Navigation</h3>
+                    <div class="space-y-1">
+                        <a href="{{ route('qm.field-types.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
+                            @svg('heroicon-o-cube', 'w-3.5 h-3.5')
+                            Feldtypen
+                        </a>
+                        <a href="{{ route('qm.field-definitions.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
+                            @svg('heroicon-o-adjustments-horizontal', 'w-3.5 h-3.5')
+                            Feld-Definitionen
+                        </a>
+                        <a href="{{ route('qm.sections.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
+                            @svg('heroicon-o-rectangle-group', 'w-3.5 h-3.5')
+                            Sektionen
+                        </a>
+                        <a href="{{ route('qm.templates.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
+                            @svg('heroicon-o-document-duplicate', 'w-3.5 h-3.5')
+                            Templates
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </x-ui-page-sidebar>
+    </x-slot>
+
+    {{-- Right Sidebar (Activity) --}}
+    <x-slot name="activity">
+        <x-ui-page-sidebar title="Hierarchie" width="w-80" :defaultOpen="false" storeKey="activityOpen" side="right">
+            <div class="p-5 space-y-5">
+                <div>
+                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Aufbau</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-lg bg-[var(--ui-muted-5)]/50 border border-[var(--ui-border)]/40">
+                            <div class="text-xs font-semibold text-[var(--ui-secondary)] mb-1">1. Feldtypen</div>
+                            <p class="text-[11px] text-[var(--ui-muted)]">Basis-Typen (Text, Zahl, Temperatur, Foto, Unterschrift ...). 17 System-Typen + eigene.</p>
                         </div>
-                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="font-semibold text-[var(--ui-secondary)]">Sektionen</span> &rarr; Felder zuordnen
+                        <div class="p-3 rounded-lg bg-[var(--ui-muted-5)]/50 border border-[var(--ui-border)]/40">
+                            <div class="text-xs font-semibold text-[var(--ui-secondary)] mb-1">2. Feld-Definitionen</div>
+                            <p class="text-[11px] text-[var(--ui-muted)]">Konfigurierte Felder mit Titel, Beschreibung, Validierung. z.B. "Kerntemperatur Fleisch" (Typ: Temperatur, Min: 63°C).</p>
                         </div>
-                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="font-semibold text-[var(--ui-secondary)]">Templates</span> &rarr; Sektionen zuordnen
+                        <div class="p-3 rounded-lg bg-[var(--ui-muted-5)]/50 border border-[var(--ui-border)]/40">
+                            <div class="text-xs font-semibold text-[var(--ui-secondary)] mb-1">3. Sektionen</div>
+                            <p class="text-[11px] text-[var(--ui-muted)]">Logische Gruppen von Feldern (z.B. "Temperaturkontrolle", "Hygiene") mit Verhaltensregeln.</p>
                         </div>
-                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="font-semibold text-[var(--ui-secondary)]">Checklisten</span> &rarr; Ausfuellen
+                        <div class="p-3 rounded-lg bg-[var(--ui-muted-5)]/50 border border-[var(--ui-border)]/40">
+                            <div class="text-xs font-semibold text-[var(--ui-secondary)] mb-1">4. Templates</div>
+                            <p class="text-[11px] text-[var(--ui-muted)]">Blueprint-Checklisten aus Sektionen. HACCP, Eskalation, Signatur-Pflicht konfigurierbar.</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-[var(--ui-muted-5)]/50 border border-[var(--ui-border)]/40">
+                            <div class="text-xs font-semibold text-[var(--ui-secondary)] mb-1">5. Checklisten</div>
+                            <p class="text-[11px] text-[var(--ui-muted)]">Ausgefuellte Instanzen eines Templates. Abweichungen werden erkannt und nachverfolgt.</p>
                         </div>
                     </div>
                 </div>
