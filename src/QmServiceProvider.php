@@ -74,6 +74,7 @@ class QmServiceProvider extends ServiceProvider
             $this->commands([
                 \Platform\Qm\Console\ProcessRecurrencesCommand::class,
                 \Platform\Qm\Console\ProcessEscalationsCommand::class,
+                \Platform\Qm\Console\SeedFieldTypesCommand::class,
             ]);
         }
 
