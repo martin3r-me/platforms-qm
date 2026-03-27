@@ -37,6 +37,11 @@ return [
                     'route' => 'qm.templates.index',
                     'icon' => 'heroicon-o-document-duplicate',
                 ],
+                'instances' => [
+                    'title' => 'Checklisten',
+                    'route' => 'qm.instances.index',
+                    'icon' => 'heroicon-o-clipboard-document-list',
+                ],
                 'sections' => [
                     'title' => 'Sektionen',
                     'route' => 'qm.sections.index',

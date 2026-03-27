@@ -127,6 +127,15 @@ class QmOverviewTool implements ToolContract, ToolMetadataContract
                         'manage_sections' => 'qm.templates.sections.PUT',
                         'duplicate' => 'qm.templates.duplicate.POST',
                     ],
+                    'instances' => [
+                        'list' => 'qm.instances.GET',
+                        'get' => 'qm.instances.id.GET',
+                        'create' => 'qm.instances.POST',
+                        'update' => 'qm.instances.PUT',
+                        'submit_responses' => 'qm.instances.responses.PUT',
+                        'complete' => 'qm.instances.complete.POST',
+                        'public_link' => 'qm.instances.public-link.POST',
+                    ],
                 ],
             ]);
         } catch (\Throwable $e) {

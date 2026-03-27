@@ -105,6 +105,15 @@ class QmServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Qm\Tools\DeleteTemplateTool());
             $registry->register(new \Platform\Qm\Tools\ManageTemplateSectionsTool());
             $registry->register(new \Platform\Qm\Tools\DuplicateTemplateTool());
+
+            // Instances
+            $registry->register(new \Platform\Qm\Tools\ListInstancesTool());
+            $registry->register(new \Platform\Qm\Tools\GetInstanceTool());
+            $registry->register(new \Platform\Qm\Tools\CreateInstanceTool());
+            $registry->register(new \Platform\Qm\Tools\UpdateInstanceTool());
+            $registry->register(new \Platform\Qm\Tools\SubmitResponsesTool());
+            $registry->register(new \Platform\Qm\Tools\CompleteInstanceTool());
+            $registry->register(new \Platform\Qm\Tools\PublicLinkTool());
         } catch (\Throwable $e) {
             \Log::warning('QM: Tool-Registrierung fehlgeschlagen', ['error' => $e->getMessage()]);
         }
