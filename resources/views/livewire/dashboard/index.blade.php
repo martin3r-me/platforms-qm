@@ -1,77 +1,161 @@
 <x-ui-page>
+    {{-- Navbar --}}
     <x-slot name="navbar">
-        <div class="d-flex align-items-center gap-2">
-            <x-heroicon-o-clipboard-document-check class="w-5 h-5" />
-            <span class="font-semibold">Quality Management</span>
-        </div>
+        <x-ui-page-navbar title="" />
     </x-slot>
 
     <x-slot name="actionbar">
-        {{-- Platzhalter fuer Aktionen --}}
+        <x-ui-page-actionbar :breadcrumbs="[
+            ['label' => 'QM', 'href' => route('qm.dashboard'), 'icon' => 'clipboard-document-check'],
+            ['label' => 'Dashboard'],
+        ]" />
     </x-slot>
 
-    <x-slot name="main">
+    {{-- Main Content --}}
+    <x-ui-page-container>
         <div class="space-y-6">
-            {{-- Stats Grid --}}
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="bg-[var(--ui-muted-5)] rounded-lg p-4">
-                    <div class="text-sm text-muted">Templates (Aktiv)</div>
-                    <div class="text-2xl font-bold">{{ $stats['templates_active'] }}</div>
-                    <div class="text-xs text-muted">von {{ $stats['templates_total'] }} gesamt</div>
-                </div>
-                <div class="bg-[var(--ui-muted-5)] rounded-lg p-4">
-                    <div class="text-sm text-muted">Offene Checklisten</div>
-                    <div class="text-2xl font-bold">{{ $stats['instances_open'] }}</div>
-                    <div class="text-xs text-muted">{{ $stats['instances_completed'] }} abgeschlossen</div>
-                </div>
-                <div class="bg-[var(--ui-muted-5)] rounded-lg p-4">
-                    <div class="text-sm text-muted">Offene Abweichungen</div>
-                    <div class="text-2xl font-bold {{ $stats['deviations_open'] > 0 ? 'text-red-500' : '' }}">{{ $stats['deviations_open'] }}</div>
-                </div>
+
+            {{-- Stats --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <x-ui-dashboard-tile
+                    title="Templates"
+                    :count="$stats['templates_active']"
+                    subtitle="Aktiv ({{ $stats['templates_total'] }} gesamt)"
+                    icon="document-duplicate"
+                    variant="secondary"
+                    size="lg"
+                />
+                <x-ui-dashboard-tile
+                    title="Checklisten"
+                    :count="$stats['instances_total']"
+                    subtitle="Gesamt"
+                    icon="clipboard-document-list"
+                    variant="secondary"
+                    size="lg"
+                />
+                <x-ui-dashboard-tile
+                    title="Offen"
+                    :count="$stats['instances_open']"
+                    subtitle="{{ $stats['instances_completed'] }} abgeschlossen"
+                    icon="clock"
+                    variant="secondary"
+                    size="lg"
+                />
+                <x-ui-dashboard-tile
+                    title="Abweichungen"
+                    :count="$stats['deviations_open']"
+                    subtitle="Offen"
+                    icon="exclamation-triangle"
+                    :variant="$stats['deviations_open'] > 0 ? 'danger' : 'secondary'"
+                    size="lg"
+                />
             </div>
 
             {{-- Recent Instances --}}
-            <div>
-                <h3 class="text-lg font-semibold mb-3">Letzte Checklisten</h3>
-                @if($recentInstances->isEmpty())
-                    <div class="bg-[var(--ui-muted-5)] rounded-lg p-6 text-center text-muted">
-                        Noch keine Checklisten vorhanden. Erstelle zuerst ein Template.
-                    </div>
-                @else
-                    <div class="space-y-2">
+            @if($recentInstances->isNotEmpty())
+            <x-ui-panel title="Letzte Checklisten" subtitle="{{ $stats['instances_total'] }} Checkliste(n) in diesem Team">
+                <x-ui-table compact="true">
+                    <x-ui-table-header>
+                        <x-ui-table-header-cell compact="true">Titel</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Template</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Status</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Erstellt von</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Erstellt</x-ui-table-header-cell>
+                    </x-ui-table-header>
+                    <x-ui-table-body>
                         @foreach($recentInstances as $instance)
-                            <div class="bg-[var(--ui-muted-5)] rounded-lg p-3 d-flex align-items-center justify-content-between">
-                                <div>
-                                    <div class="font-medium">{{ $instance->title }}</div>
-                                    <div class="text-xs text-muted">
-                                        {{ $instance->template?->name ?? 'Ad-hoc' }}
-                                        &middot; {{ $instance->createdByUser?->name }}
-                                        &middot; {{ $instance->created_at?->diffForHumans() }}
-                                    </div>
-                                </div>
-                                <x-ui-badge :color="match($instance->status) {
-                                    'completed' => 'green',
-                                    'in_progress' => 'blue',
-                                    'cancelled' => 'red',
-                                    default => 'gray',
-                                }">{{ $instance->status }}</x-ui-badge>
-                            </div>
+                        <x-ui-table-row compact="true">
+                            <x-ui-table-cell compact="true">
+                                <div class="font-medium text-[var(--ui-secondary)]">{{ $instance->title }}</div>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
+                                <span class="text-sm text-[var(--ui-muted)]">{{ $instance->template?->name ?? 'Ad-hoc' }}</span>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
+                                <x-ui-badge :variant="match($instance->status) {
+                                    'completed' => 'success',
+                                    'in_progress' => 'info',
+                                    'cancelled' => 'danger',
+                                    default => 'warning',
+                                }">
+                                    {{ ucfirst($instance->status) }}
+                                </x-ui-badge>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
+                                <span class="text-sm text-[var(--ui-muted)]">{{ $instance->createdByUser?->name ?? '-' }}</span>
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
+                                <span class="text-sm text-[var(--ui-muted)]">{{ $instance->created_at?->diffForHumans() }}</span>
+                            </x-ui-table-cell>
+                        </x-ui-table-row>
                         @endforeach
-                    </div>
-                @endif
-            </div>
+                    </x-ui-table-body>
+                </x-ui-table>
+            </x-ui-panel>
+            @else
+            {{-- Empty State --}}
+            <x-ui-panel>
+                <div class="p-12 text-center">
+                    @svg('heroicon-o-clipboard-document-check', 'w-16 h-16 text-[var(--ui-muted)] mx-auto mb-4')
+                    <h3 class="text-lg font-semibold text-[var(--ui-secondary)] mb-2">Noch keine Checklisten</h3>
+                    <p class="text-[var(--ui-muted)]">Erstelle zuerst ein Template per AI-Assistent, dann koennen Checklisten ausgefuellt werden.</p>
+                </div>
+            </x-ui-panel>
+            @endif
         </div>
-    </x-slot>
+    </x-ui-page-container>
 
+    {{-- Left Sidebar --}}
     <x-slot name="sidebar">
-        <div class="space-y-4">
-            <div class="text-sm font-semibold text-muted uppercase">Navigation</div>
-            <div class="space-y-1">
-                <a href="{{ route('qm.dashboard') }}" class="d-flex align-items-center gap-2 p-2 rounded-lg bg-[var(--ui-muted-5)]">
-                    <x-heroicon-o-home class="w-4 h-4" />
-                    <span>Dashboard</span>
-                </a>
+        <x-ui-page-sidebar title="Uebersicht" width="w-72" :defaultOpen="true">
+            <div class="p-5 space-y-5">
+                {{-- Statistiken --}}
+                <div>
+                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Statistiken</h3>
+                    <div class="space-y-2">
+                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                            <div class="d-flex items-center gap-2">
+                                @svg('heroicon-o-document-duplicate', 'w-4 h-4 text-[var(--ui-muted)]')
+                                <span class="text-xs text-[var(--ui-muted)]">Templates</span>
+                            </div>
+                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $stats['templates_total'] }}</span>
+                        </div>
+                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                            <div class="d-flex items-center gap-2">
+                                @svg('heroicon-o-clipboard-document-list', 'w-4 h-4 text-[var(--ui-muted)]')
+                                <span class="text-xs text-[var(--ui-muted)]">Checklisten</span>
+                            </div>
+                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $stats['instances_total'] }}</span>
+                        </div>
+                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                            <div class="d-flex items-center gap-2">
+                                @svg('heroicon-o-exclamation-triangle', 'w-4 h-4 text-[var(--ui-muted)]')
+                                <span class="text-xs text-[var(--ui-muted)]">Abweichungen (offen)</span>
+                            </div>
+                            <span class="text-sm font-bold {{ $stats['deviations_open'] > 0 ? 'text-red-500' : 'text-[var(--ui-secondary)]' }}">{{ $stats['deviations_open'] }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Schnellzugriff --}}
+                <div>
+                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Hierarchie</h3>
+                    <div class="space-y-1.5 text-[11px] text-[var(--ui-muted)]">
+                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
+                            <span class="font-semibold text-[var(--ui-secondary)]">Feldtypen</span> &rarr; Feld-Definitionen
+                        </div>
+                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
+                            <span class="font-semibold text-[var(--ui-secondary)]">Sektionen</span> &rarr; Felder zuordnen
+                        </div>
+                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
+                            <span class="font-semibold text-[var(--ui-secondary)]">Templates</span> &rarr; Sektionen zuordnen
+                        </div>
+                        <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
+                            <span class="font-semibold text-[var(--ui-secondary)]">Checklisten</span> &rarr; Ausfuellen
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </x-ui-page-sidebar>
     </x-slot>
 </x-ui-page>
