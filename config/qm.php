@@ -42,6 +42,11 @@ return [
                     'route' => 'qm.instances.index',
                     'icon' => 'heroicon-o-clipboard-document-list',
                 ],
+                'deviations' => [
+                    'title' => 'Abweichungen',
+                    'route' => 'qm.deviations.index',
+                    'icon' => 'heroicon-o-exclamation-triangle',
+                ],
                 'sections' => [
                     'title' => 'Sektionen',
                     'route' => 'qm.sections.index',

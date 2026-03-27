@@ -114,6 +114,17 @@ class QmServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Qm\Tools\SubmitResponsesTool());
             $registry->register(new \Platform\Qm\Tools\CompleteInstanceTool());
             $registry->register(new \Platform\Qm\Tools\PublicLinkTool());
+
+            // Deviations
+            $registry->register(new \Platform\Qm\Tools\ListDeviationsTool());
+            $registry->register(new \Platform\Qm\Tools\GetDeviationTool());
+            $registry->register(new \Platform\Qm\Tools\UpdateDeviationTool());
+            $registry->register(new \Platform\Qm\Tools\EscalateDeviationTool());
+            $registry->register(new \Platform\Qm\Tools\VerifyDeviationTool());
+
+            // Analytics
+            $registry->register(new \Platform\Qm\Tools\QmStatsTool());
+            $registry->register(new \Platform\Qm\Tools\QmExportTool());
         } catch (\Throwable $e) {
             \Log::warning('QM: Tool-Registrierung fehlgeschlagen', ['error' => $e->getMessage()]);
         }

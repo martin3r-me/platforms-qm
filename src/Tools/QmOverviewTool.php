@@ -136,6 +136,17 @@ class QmOverviewTool implements ToolContract, ToolMetadataContract
                         'complete' => 'qm.instances.complete.POST',
                         'public_link' => 'qm.instances.public-link.POST',
                     ],
+                    'deviations' => [
+                        'list' => 'qm.deviations.GET',
+                        'get' => 'qm.deviations.id.GET',
+                        'update' => 'qm.deviations.PUT',
+                        'escalate' => 'qm.deviations.escalate.POST',
+                        'verify' => 'qm.deviations.verify.POST',
+                    ],
+                    'analytics' => [
+                        'stats' => 'qm.stats.GET',
+                        'export' => 'qm.export.GET',
+                    ],
                 ],
             ]);
         } catch (\Throwable $e) {

@@ -11,6 +11,8 @@ use Platform\Qm\Livewire\Template\Index as TemplateIndex;
 use Platform\Qm\Livewire\Template\Show as TemplateShow;
 use Platform\Qm\Livewire\Instance\Index as InstanceIndex;
 use Platform\Qm\Livewire\Instance\Show as InstanceShow;
+use Platform\Qm\Livewire\Deviation\Index as DeviationIndex;
+use Platform\Qm\Livewire\Deviation\Show as DeviationShow;
 
 Route::get('/', Dashboard::class)->name('qm.dashboard');
 
@@ -28,3 +30,6 @@ Route::get('/templates/{template}', TemplateShow::class)->name('qm.templates.sho
 
 Route::get('/instances', InstanceIndex::class)->name('qm.instances.index');
 Route::get('/instances/{instance}', InstanceShow::class)->name('qm.instances.show');
+
+Route::get('/deviations', DeviationIndex::class)->name('qm.deviations.index');
+Route::get('/deviations/{deviation}', DeviationShow::class)->name('qm.deviations.show');
