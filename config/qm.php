@@ -62,6 +62,11 @@ return [
                     'route' => 'qm.field-types.index',
                     'icon' => 'heroicon-o-cube',
                 ],
+                'lookups' => [
+                    'title' => 'Stammdaten',
+                    'route' => 'qm.lookups.index',
+                    'icon' => 'heroicon-o-table-cells',
+                ],
             ],
         ],
     ],

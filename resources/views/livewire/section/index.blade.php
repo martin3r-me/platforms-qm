@@ -17,6 +17,7 @@
                 <x-ui-table compact="true">
                     <x-ui-table-header>
                         <x-ui-table-header-cell compact="true">Titel</x-ui-table-header-cell>
+                        <x-ui-table-header-cell compact="true">Kategorie</x-ui-table-header-cell>
                         <x-ui-table-header-cell compact="true">Felder</x-ui-table-header-cell>
                         <x-ui-table-header-cell compact="true">In Templates</x-ui-table-header-cell>
                         <x-ui-table-header-cell compact="true">Erstellt von</x-ui-table-header-cell>
@@ -30,6 +31,11 @@
                                 @if($section->description)
                                 <div class="text-xs text-[var(--ui-muted)] truncate max-w-xs mt-0.5">{{ Str::limit($section->description, 60) }}</div>
                                 @endif
+                            </x-ui-table-cell>
+                            <x-ui-table-cell compact="true">
+                                <x-ui-badge :variant="($section->category ?? 'standard') === 'addon' ? 'info' : 'secondary'" size="sm">
+                                    {{ ($section->category ?? 'standard') === 'addon' ? 'Add-On' : 'Standard' }}
+                                </x-ui-badge>
                             </x-ui-table-cell>
                             <x-ui-table-cell compact="true">
                                 <span class="text-sm text-[var(--ui-muted)]">{{ $section->section_fields_count }}</span>

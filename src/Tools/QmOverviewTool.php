@@ -80,6 +80,31 @@ class QmOverviewTool implements ToolContract, ToolMetadataContract
                         'table' => 'qm_attachments',
                         'note' => 'Polymorphe Anhaenge (Fotos, Dateien, Signaturen) auf Responses oder Deviations.',
                     ],
+                    'qm_lookup_tables' => [
+                        'table' => 'qm_lookup_tables',
+                        'note' => 'Team-eigene Stammdaten-Tabellen (z.B. "Event-Typ", "Location", "Maschinentyp"). Eintraege in qm_lookup_entries.',
+                    ],
+                    'qm_lookup_entries' => [
+                        'table' => 'qm_lookup_entries',
+                        'note' => 'Eintraege pro Lookup-Tabelle mit label, value, metadata. Datenquelle fuer Wizard-Select-Felder.',
+                    ],
+                    'qm_wizard_fields' => [
+                        'table' => 'qm_wizard_fields',
+                        'note' => 'Startfelder pro Template - was der Wizard beim Erstellen einer Checkliste abfragt (Typ, Reihenfolge, Pflicht, Datenquelle).',
+                    ],
+                    'qm_wizard_rules' => [
+                        'table' => 'qm_wizard_rules',
+                        'note' => 'Aktivierungsregeln: "Wenn Wizard-Feld X = Wert Y -> bestimmte Sections ein-/ausblenden".',
+                    ],
+                    'qm_wizard_rule_sections' => [
+                        'table' => 'qm_wizard_rule_sections',
+                        'note' => 'Pivot: Regel -> Template-Section -> Effekt (show/hide).',
+                    ],
+                ],
+                'wizard_concept' => [
+                    'description' => 'Der Wizard ermoeglicht kontextabhaengige Checklisten. Teams definieren Lookup-Tabellen (Stammdaten) und konfigurieren Wizard-Felder + Regeln pro Template.',
+                    'workflow' => '1. Lookup-Tabellen anlegen (Stammdaten) -> 2. Wizard-Felder am Template konfigurieren -> 3. Regeln definieren (wenn Feld=Wert -> Sections show/hide) -> 4. Wizard ausfuellen -> 5. Instanz mit nur relevanten Sections erstellen',
+                    'section_categories' => 'Sections haben category: standard (immer dabei) oder addon (nur per Wizard-Regel aktiviert)',
                 ],
                 'behavior_rules' => [
                     'always' => 'Feld wird immer angezeigt',
@@ -142,6 +167,22 @@ class QmOverviewTool implements ToolContract, ToolMetadataContract
                         'update' => 'qm.deviations.PUT',
                         'escalate' => 'qm.deviations.escalate.POST',
                         'verify' => 'qm.deviations.verify.POST',
+                    ],
+                    'lookup_tables' => [
+                        'list' => 'qm.lookup-tables.GET',
+                        'get' => 'qm.lookup-table.GET',
+                        'create' => 'qm.lookup-tables.POST',
+                        'update' => 'qm.lookup-tables.PUT',
+                        'delete' => 'qm.lookup-tables.DELETE',
+                        'manage_entries' => 'qm.lookup-entries.PUT',
+                    ],
+                    'wizard' => [
+                        'get_config' => 'qm.wizard.GET',
+                        'manage_fields' => 'qm.wizard.fields.PUT',
+                        'manage_rules' => 'qm.wizard.rules.PUT',
+                        'manage_rule_sections' => 'qm.wizard.rule-sections.PUT',
+                        'evaluate' => 'qm.wizard.evaluate.POST',
+                        'create_instance' => 'qm.wizard.create-instance.POST',
                     ],
                     'analytics' => [
                         'stats' => 'qm.stats.GET',

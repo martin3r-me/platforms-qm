@@ -86,6 +86,16 @@ class QmTemplate extends Model
         return $this->hasMany(QmInstance::class, 'qm_template_id');
     }
 
+    public function wizardFields(): HasMany
+    {
+        return $this->hasMany(QmWizardField::class, 'qm_template_id')->orderBy('sort_order');
+    }
+
+    public function wizardRules(): HasMany
+    {
+        return $this->hasMany(QmWizardRule::class, 'qm_template_id')->orderBy('sort_order');
+    }
+
     public function scopeForTeam($query, int $teamId)
     {
         return $query->where('team_id', $teamId);

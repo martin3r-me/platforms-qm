@@ -4,23 +4,29 @@ namespace Platform\Qm\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\Uid\UuidV7;
 
-class QmTemplateSection extends Model
+class QmWizardRule extends Model
 {
-    protected $table = 'qm_template_sections';
+    protected $table = 'qm_wizard_rules';
 
     protected $fillable = [
         'uuid',
         'qm_template_id',
-        'qm_section_id',
-        'position',
-        'is_required',
-        'phase_label',
+        'name',
+        'rule_type',
+        'condition_field',
+        'condition_operator',
+        'condition_value',
+        'description',
+        'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
-        'is_required' => 'boolean',
+        'condition_value' => 'array',
+        'is_active' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -40,8 +46,8 @@ class QmTemplateSection extends Model
         return $this->belongsTo(QmTemplate::class, 'qm_template_id');
     }
 
-    public function section(): BelongsTo
+    public function ruleSections(): HasMany
     {
-        return $this->belongsTo(QmSection::class, 'qm_section_id');
+        return $this->hasMany(QmWizardRuleSection::class, 'qm_wizard_rule_id');
     }
 }

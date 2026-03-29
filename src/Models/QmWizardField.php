@@ -6,21 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Uid\UuidV7;
 
-class QmTemplateSection extends Model
+class QmWizardField extends Model
 {
-    protected $table = 'qm_template_sections';
+    protected $table = 'qm_wizard_fields';
 
     protected $fillable = [
         'uuid',
         'qm_template_id',
-        'qm_section_id',
-        'position',
+        'technical_name',
+        'label',
+        'input_type',
+        'qm_lookup_table_id',
+        'sort_order',
         'is_required',
-        'phase_label',
+        'description',
+        'config',
     ];
 
     protected $casts = [
         'is_required' => 'boolean',
+        'config' => 'array',
     ];
 
     protected static function booted(): void
@@ -40,8 +45,8 @@ class QmTemplateSection extends Model
         return $this->belongsTo(QmTemplate::class, 'qm_template_id');
     }
 
-    public function section(): BelongsTo
+    public function lookupTable(): BelongsTo
     {
-        return $this->belongsTo(QmSection::class, 'qm_section_id');
+        return $this->belongsTo(QmLookupTable::class, 'qm_lookup_table_id');
     }
 }

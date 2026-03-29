@@ -16,7 +16,7 @@
         <div class="space-y-6">
 
             {{-- Stats --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <x-ui-dashboard-tile
                     title="Templates"
                     :count="$stats['templates_active']"
@@ -47,6 +47,14 @@
                     subtitle="Offen"
                     icon="exclamation-triangle"
                     :variant="$stats['deviations_open'] > 0 ? 'danger' : 'secondary'"
+                    size="lg"
+                />
+                <x-ui-dashboard-tile
+                    title="Stammdaten"
+                    :count="$stats['lookup_tables']"
+                    subtitle="Lookup-Tabellen"
+                    icon="table-cells"
+                    variant="secondary"
                     size="lg"
                 />
             </div>
@@ -156,6 +164,10 @@
                         <a href="{{ route('qm.templates.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
                             @svg('heroicon-o-document-duplicate', 'w-3.5 h-3.5')
                             Templates
+                        </a>
+                        <a href="{{ route('qm.lookups.index') }}" class="d-flex items-center gap-2 p-2 rounded-md text-xs text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)] transition-colors" wire:navigate>
+                            @svg('heroicon-o-table-cells', 'w-3.5 h-3.5')
+                            Stammdaten
                         </a>
                     </div>
                 </div>

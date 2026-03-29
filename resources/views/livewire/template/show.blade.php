@@ -13,15 +13,41 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Wizard Configuration Link --}}
+            @if($template->wizardFields->isNotEmpty())
+            <x-ui-panel>
+                <div class="p-4 d-flex items-center justify-between">
+                    <div class="d-flex items-center gap-3">
+                        @svg('heroicon-o-sparkles', 'w-5 h-5 text-[var(--ui-muted)]')
+                        <div>
+                            <div class="text-sm font-medium text-[var(--ui-secondary)]">Wizard konfiguriert</div>
+                            <div class="text-xs text-[var(--ui-muted)]">{{ $template->wizardFields->count() }} Feld(er), {{ $template->wizardRules->count() }} Regel(n)</div>
+                        </div>
+                    </div>
+                    <a href="{{ route('qm.wizard.show', $template) }}" wire:navigate>
+                        <x-ui-button variant="secondary" size="sm">Wizard anzeigen</x-ui-button>
+                    </a>
+                </div>
+            </x-ui-panel>
+            @endif
+
             {{-- Sections with Fields --}}
             @if($template->templateSections->isNotEmpty())
                 @foreach($template->templateSections as $ts)
                 <x-ui-panel
                     title="{{ $ts->section->title }}"
-                    subtitle="{{ $ts->section->sectionFields->count() }} Feld(er) &middot; Position {{ $ts->position }} &middot; {{ $ts->is_required ? 'Pflicht' : 'Optional' }}"
+                    subtitle="{{ $ts->section->sectionFields->count() }} Feld(er) &middot; Position {{ $ts->position }} &middot; {{ $ts->is_required ? 'Pflicht' : 'Optional' }}{{ $ts->phase_label ? ' &middot; Phase: ' . $ts->phase_label : '' }}"
                 >
+                    <div class="px-5 pt-3 d-flex items-center gap-2">
+                        @if(($ts->section->category ?? 'standard') === 'addon')
+                        <x-ui-badge variant="info" size="sm">Add-On</x-ui-badge>
+                        @endif
+                        @if($ts->phase_label)
+                        <x-ui-badge variant="secondary" size="sm">{{ $ts->phase_label }}</x-ui-badge>
+                        @endif
+                    </div>
                     @if($ts->section->description)
-                        <div class="px-5 pt-3 text-xs text-[var(--ui-muted)]">{{ $ts->section->description }}</div>
+                        <div class="px-5 pt-2 text-xs text-[var(--ui-muted)]">{{ $ts->section->description }}</div>
                     @endif
 
                     @if($ts->section->sectionFields->isNotEmpty())

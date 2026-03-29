@@ -5,29 +5,28 @@ namespace Platform\Qm\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Platform\ActivityLog\Traits\LogsActivity;
 use Symfony\Component\Uid\UuidV7;
 
-class QmSection extends Model
+class QmLookupTable extends Model
 {
     use LogsActivity, SoftDeletes;
 
-    protected $table = 'qm_sections';
+    protected $table = 'qm_lookup_tables';
 
     protected $fillable = [
         'uuid',
         'team_id',
-        'title',
+        'name',
         'description',
-        'category',
-        'i18n',
+        'sort_order',
+        'is_active',
         'created_by_user_id',
     ];
 
     protected $casts = [
-        'i18n' => 'array',
+        'is_active' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -52,20 +51,23 @@ class QmSection extends Model
         return $this->belongsTo(\Platform\Core\Models\User::class, 'created_by_user_id');
     }
 
-    public function sectionFields(): HasMany
+    public function entries(): HasMany
     {
-        return $this->hasMany(QmSectionField::class, 'qm_section_id')->orderBy('position');
+        return $this->hasMany(QmLookupEntry::class, 'qm_lookup_table_id')->orderBy('sort_order');
     }
 
-    public function templates(): BelongsToMany
+    public function wizardFields(): HasMany
     {
-        return $this->belongsToMany(QmTemplate::class, 'qm_template_sections', 'qm_section_id', 'qm_template_id')
-            ->withPivot(['position', 'is_required'])
-            ->withTimestamps();
+        return $this->hasMany(QmWizardField::class, 'qm_lookup_table_id');
     }
 
     public function scopeForTeam($query, int $teamId)
     {
         return $query->where('team_id', $teamId);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

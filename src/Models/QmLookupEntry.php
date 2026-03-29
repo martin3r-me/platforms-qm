@@ -4,23 +4,29 @@ namespace Platform\Qm\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Symfony\Component\Uid\UuidV7;
 
-class QmTemplateSection extends Model
+class QmLookupEntry extends Model
 {
-    protected $table = 'qm_template_sections';
+    use SoftDeletes;
+
+    protected $table = 'qm_lookup_entries';
 
     protected $fillable = [
         'uuid',
-        'qm_template_id',
-        'qm_section_id',
-        'position',
-        'is_required',
-        'phase_label',
+        'qm_lookup_table_id',
+        'label',
+        'value',
+        'description',
+        'sort_order',
+        'is_active',
+        'metadata',
     ];
 
     protected $casts = [
-        'is_required' => 'boolean',
+        'is_active' => 'boolean',
+        'metadata' => 'array',
     ];
 
     protected static function booted(): void
@@ -35,13 +41,13 @@ class QmTemplateSection extends Model
         });
     }
 
-    public function template(): BelongsTo
+    public function lookupTable(): BelongsTo
     {
-        return $this->belongsTo(QmTemplate::class, 'qm_template_id');
+        return $this->belongsTo(QmLookupTable::class, 'qm_lookup_table_id');
     }
 
-    public function section(): BelongsTo
+    public function scopeActive($query)
     {
-        return $this->belongsTo(QmSection::class, 'qm_section_id');
+        return $query->where('is_active', true);
     }
 }

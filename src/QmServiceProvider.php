@@ -141,6 +141,22 @@ class QmServiceProvider extends ServiceProvider
             $registry->register(new \Platform\Qm\Tools\EscalateDeviationTool());
             $registry->register(new \Platform\Qm\Tools\VerifyDeviationTool());
 
+            // Lookup Tables
+            $registry->register(new \Platform\Qm\Tools\ListLookupTablesTool());
+            $registry->register(new \Platform\Qm\Tools\GetLookupTableTool());
+            $registry->register(new \Platform\Qm\Tools\CreateLookupTableTool());
+            $registry->register(new \Platform\Qm\Tools\UpdateLookupTableTool());
+            $registry->register(new \Platform\Qm\Tools\DeleteLookupTableTool());
+            $registry->register(new \Platform\Qm\Tools\ManageLookupEntriesTool());
+
+            // Wizard
+            $registry->register(new \Platform\Qm\Tools\GetWizardConfigTool());
+            $registry->register(new \Platform\Qm\Tools\ManageWizardFieldsTool());
+            $registry->register(new \Platform\Qm\Tools\ManageWizardRulesTool());
+            $registry->register(new \Platform\Qm\Tools\ManageWizardRuleSectionsTool());
+            $registry->register(new \Platform\Qm\Tools\EvaluateWizardTool());
+            $registry->register(new \Platform\Qm\Tools\CreateInstanceFromWizardTool());
+
             // Analytics
             $registry->register(new \Platform\Qm\Tools\QmStatsTool());
             $registry->register(new \Platform\Qm\Tools\QmExportTool());

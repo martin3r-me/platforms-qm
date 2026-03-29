@@ -87,6 +87,12 @@
                     <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Info</h3>
                     <div class="space-y-2">
                         <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
+                            <span class="text-xs text-[var(--ui-muted)]">Kategorie</span>
+                            <x-ui-badge :variant="($section->category ?? 'standard') === 'addon' ? 'info' : 'secondary'" size="sm">
+                                {{ ($section->category ?? 'standard') === 'addon' ? 'Add-On' : 'Standard' }}
+                            </x-ui-badge>
+                        </div>
+                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
                             <span class="text-xs text-[var(--ui-muted)]">Felder</span>
                             <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $section->sectionFields->count() }}</span>
                         </div>

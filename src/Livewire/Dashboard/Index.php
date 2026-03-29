@@ -6,6 +6,7 @@ use Livewire\Component;
 use Platform\Qm\Models\QmTemplate;
 use Platform\Qm\Models\QmInstance;
 use Platform\Qm\Models\QmDeviation;
+use Platform\Qm\Models\QmLookupTable;
 
 class Index extends Component
 {
@@ -23,6 +24,7 @@ class Index extends Component
                 ->whereHas('instance', fn ($q) => $q->forTeam($teamId))
                 ->open()
                 ->count(),
+            'lookup_tables' => QmLookupTable::forTeam($teamId)->count(),
         ];
 
         $recentInstances = QmInstance::forTeam($teamId)

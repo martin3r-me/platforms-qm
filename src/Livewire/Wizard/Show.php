@@ -1,10 +1,11 @@
 <?php
 
-namespace Platform\Qm\Livewire\Template;
+namespace Platform\Qm\Livewire\Wizard;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Platform\Qm\Models\QmTemplate;
+use Platform\Qm\Services\QmWizardService;
 
 class Show extends Component
 {
@@ -23,14 +24,11 @@ class Show extends Component
 
     public function render()
     {
-        $this->template->load([
-            'createdByUser',
-            'templateSections.section.sectionFields.fieldDefinition.fieldType',
-            'wizardFields',
-            'wizardRules',
-        ]);
-        $this->template->loadCount('instances');
+        $service = new QmWizardService();
+        $config = $service->getWizardConfig($this->template);
 
-        return view('qm::livewire.template.show')->layout('platform::layouts.app');
+        return view('qm::livewire.wizard.show', [
+            'config' => $config,
+        ])->layout('platform::layouts.app');
     }
 }
