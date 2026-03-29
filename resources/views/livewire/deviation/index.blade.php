@@ -23,6 +23,24 @@
             {{-- Table --}}
             @if($deviations->isNotEmpty())
             <x-ui-panel title="Abweichungen" subtitle="{{ $stats['total'] }} Abweichung(en)">
+                <div class="px-4 pt-3 pb-2 space-y-3">
+                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Abweichung suchen..." size="sm" />
+                    <div class="d-flex items-center gap-1 flex-wrap">
+                        @foreach(['' => 'Alle', 'open' => 'Offen', 'acknowledged' => 'Bestaetigt', 'resolved' => 'Behoben', 'verified' => 'Verifiziert'] as $key => $label)
+                        <button wire:click="setStatusFilter('{{ $key }}')"
+                            class="px-2.5 py-1 rounded-md text-xs transition-colors {{ $statusFilter === $key ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
+                            {{ $label }}
+                        </button>
+                        @endforeach
+                        <span class="text-[var(--ui-border)]">|</span>
+                        @foreach(['low' => 'Niedrig', 'medium' => 'Mittel', 'high' => 'Hoch', 'critical' => 'Kritisch'] as $key => $label)
+                        <button wire:click="setSeverityFilter('{{ $severityFilter === $key ? '' : $key }}')"
+                            class="px-2.5 py-1 rounded-md text-xs transition-colors {{ $severityFilter === $key ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
+                            {{ $label }}
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
                 <x-ui-table compact="true">
                     <x-ui-table-header>
                         <x-ui-table-header-cell compact="true">Titel</x-ui-table-header-cell>
@@ -97,59 +115,4 @@
             @endif
         </div>
     </x-ui-page-container>
-
-    {{-- Left Sidebar --}}
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Filter" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Suche</h3>
-                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Abweichung suchen..." size="sm" />
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Status</h3>
-                    <div class="space-y-1">
-                        <button wire:click="setStatusFilter('')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === '' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span>Alle</span>
-                            <span>{{ $stats['total'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('open')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'open' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span>Offen</span>
-                            <span>{{ $stats['open'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('acknowledged')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'acknowledged' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span>Bestaetigt</span>
-                            <span>{{ $stats['acknowledged'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('resolved')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'resolved' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span>Behoben</span>
-                            <span>{{ $stats['resolved'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('verified')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'verified' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span>Verifiziert</span>
-                            <span>{{ $stats['verified'] }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Schwere</h3>
-                    <div class="space-y-1">
-                        @foreach(['low' => 'Niedrig', 'medium' => 'Mittel', 'high' => 'Hoch', 'critical' => 'Kritisch'] as $key => $label)
-                        <button wire:click="setSeverityFilter('{{ $severityFilter === $key ? '' : $key }}')"
-                            class="d-flex items-center w-full p-2 rounded-md text-xs transition-colors {{ $severityFilter === $key ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            {{ $label }}
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

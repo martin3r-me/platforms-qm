@@ -21,6 +21,9 @@
 
             {{-- Table --}}
             <x-ui-panel title="Feldtypen" subtitle="{{ $stats['total'] }} Typ(en) verfuegbar">
+                <div class="px-4 pt-3 pb-2">
+                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Feldtyp suchen..." size="sm" />
+                </div>
                 <x-ui-table compact="true">
                     <x-ui-table-header>
                         <x-ui-table-header-cell compact="true">Key</x-ui-table-header-cell>
@@ -56,15 +59,4 @@
             </x-ui-panel>
         </div>
     </x-ui-page-container>
-
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Filter" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Suche</h3>
-                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Feldtyp suchen..." size="sm" />
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

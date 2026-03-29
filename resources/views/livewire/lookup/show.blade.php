@@ -13,6 +13,25 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Info --}}
+            <x-ui-panel>
+                <div class="p-4">
+                    @if($lookupTable->description)
+                    <p class="text-sm text-[var(--ui-muted)] leading-relaxed mb-3">{{ $lookupTable->description }}</p>
+                    @endif
+                    <div class="d-flex items-center gap-3 flex-wrap text-xs text-[var(--ui-muted)]">
+                        <x-ui-badge :variant="$lookupTable->is_active ? 'success' : 'secondary'">
+                            {{ $lookupTable->is_active ? 'Aktiv' : 'Inaktiv' }}
+                        </x-ui-badge>
+                        <span>{{ $lookupTable->entries_count }} Eintraege</span>
+                        <span>{{ $lookupTable->wizard_fields_count }} Wizard-Felder</span>
+                        <span class="text-[var(--ui-border)]">|</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-user', 'w-3.5 h-3.5') {{ $lookupTable->createdByUser?->name ?? 'Unbekannt' }}</span>
+                        <span>{{ $lookupTable->created_at?->format('d.m.Y H:i') }}</span>
+                    </div>
+                </div>
+            </x-ui-panel>
+
             {{-- Entries --}}
             <x-ui-panel title="Eintraege" subtitle="{{ $lookupTable->entries->count() }} Eintrag/Eintraege">
                 @if($lookupTable->entries->isNotEmpty())
@@ -54,49 +73,4 @@
             </x-ui-panel>
         </div>
     </x-ui-page-container>
-
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Details" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Status</h3>
-                    <x-ui-badge :variant="$lookupTable->is_active ? 'success' : 'secondary'">
-                        {{ $lookupTable->is_active ? 'Aktiv' : 'Inaktiv' }}
-                    </x-ui-badge>
-                </div>
-
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Info</h3>
-                    <div class="space-y-2">
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Eintraege</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $lookupTable->entries_count }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">In Wizard-Feldern</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $lookupTable->wizard_fields_count }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-2 text-xs text-[var(--ui-muted)]">
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                        {{ $lookupTable->createdByUser?->name ?? 'Unbekannt' }}
-                    </div>
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-calendar', 'w-3.5 h-3.5')
-                        {{ $lookupTable->created_at?->format('d.m.Y H:i') }}
-                    </div>
-                </div>
-
-                @if($lookupTable->description)
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Beschreibung</h3>
-                    <p class="text-xs text-[var(--ui-muted)] leading-relaxed">{{ $lookupTable->description }}</p>
-                </div>
-                @endif
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

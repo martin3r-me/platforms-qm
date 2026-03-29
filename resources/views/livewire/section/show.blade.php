@@ -13,6 +13,25 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Section Info --}}
+            <x-ui-panel>
+                <div class="p-4">
+                    @if($section->description)
+                    <p class="text-sm text-[var(--ui-muted)] leading-relaxed mb-3">{{ $section->description }}</p>
+                    @endif
+                    <div class="d-flex items-center gap-3 flex-wrap text-xs text-[var(--ui-muted)]">
+                        <x-ui-badge :variant="($section->category ?? 'standard') === 'addon' ? 'info' : 'secondary'" size="sm">
+                            {{ ($section->category ?? 'standard') === 'addon' ? 'Add-On' : 'Standard' }}
+                        </x-ui-badge>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-adjustments-horizontal', 'w-3.5 h-3.5') {{ $section->sectionFields->count() }} Felder</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-document-duplicate', 'w-3.5 h-3.5') {{ $section->templates->count() }} Templates</span>
+                        <span class="text-[var(--ui-border)]">|</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-user', 'w-3.5 h-3.5') {{ $section->createdByUser?->name ?? '-' }}</span>
+                        <span>{{ $section->created_at?->format('d.m.Y') }}</span>
+                    </div>
+                </div>
+            </x-ui-panel>
+
             {{-- Fields --}}
             <x-ui-panel title="Felder" subtitle="{{ $section->sectionFields->count() }} Feld(er) in dieser Sektion">
                 @if($section->sectionFields->isNotEmpty())
@@ -79,51 +98,4 @@
             @endif
         </div>
     </x-ui-page-container>
-
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Details" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Info</h3>
-                    <div class="space-y-2">
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Kategorie</span>
-                            <x-ui-badge :variant="($section->category ?? 'standard') === 'addon' ? 'info' : 'secondary'" size="sm">
-                                {{ ($section->category ?? 'standard') === 'addon' ? 'Add-On' : 'Standard' }}
-                            </x-ui-badge>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Felder</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $section->sectionFields->count() }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">In Templates</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $section->templates->count() }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <div class="d-flex items-center gap-2">
-                                @svg('heroicon-o-user', 'w-3.5 h-3.5 text-[var(--ui-muted)]')
-                                <span class="text-xs text-[var(--ui-muted)]">Erstellt von</span>
-                            </div>
-                            <span class="text-xs text-[var(--ui-secondary)]">{{ $section->createdByUser?->name ?? '-' }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <div class="d-flex items-center gap-2">
-                                @svg('heroicon-o-calendar', 'w-3.5 h-3.5 text-[var(--ui-muted)]')
-                                <span class="text-xs text-[var(--ui-muted)]">Erstellt</span>
-                            </div>
-                            <span class="text-xs text-[var(--ui-secondary)]">{{ $section->created_at?->format('d.m.Y') }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                @if($section->description)
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Beschreibung</h3>
-                    <p class="text-xs text-[var(--ui-muted)] leading-relaxed">{{ $section->description }}</p>
-                </div>
-                @endif
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

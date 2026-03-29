@@ -13,6 +13,52 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Instance Info --}}
+            <x-ui-panel>
+                <div class="p-4">
+                    <div class="d-flex items-center gap-3 flex-wrap text-xs text-[var(--ui-muted)]">
+                        <x-ui-badge :variant="match($instance->status) {
+                            'completed' => 'success',
+                            'in_progress' => 'info',
+                            'cancelled' => 'danger',
+                            default => 'warning',
+                        }">
+                            {{ match($instance->status) {
+                                'open' => 'Offen',
+                                'in_progress' => 'In Bearbeitung',
+                                'completed' => 'Abgeschlossen',
+                                'cancelled' => 'Abgebrochen',
+                                default => ucfirst($instance->status),
+                            } }}
+                        </x-ui-badge>
+                        @if($instance->template)
+                        <a href="{{ route('qm.templates.show', $instance->template) }}" wire:navigate class="d-flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            @svg('heroicon-o-document-duplicate', 'w-3.5 h-3.5') {{ $instance->template->name }}
+                        </a>
+                        @endif
+                        @if($instance->score !== null)
+                        <span class="font-mono font-bold {{ $instance->score >= 80 ? 'text-green-600' : ($instance->score >= 50 ? 'text-yellow-600' : 'text-red-500') }}">
+                            {{ number_format($instance->score, 0) }}%
+                        </span>
+                        @endif
+                        @if($instance->due_at)
+                        <span class="d-flex items-center gap-1 {{ $instance->due_at->isPast() && !in_array($instance->status, ['completed', 'cancelled']) ? 'text-red-500 font-bold' : '' }}">
+                            @svg('heroicon-o-clock', 'w-3.5 h-3.5') {{ $instance->due_at->format('d.m.Y H:i') }}
+                        </span>
+                        @endif
+                        <span class="text-[var(--ui-border)]">|</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-user', 'w-3.5 h-3.5') {{ $instance->createdByUser?->name ?? 'Unbekannt' }}</span>
+                        <span>{{ $instance->created_at?->format('d.m.Y H:i') }}</span>
+                        @if($instance->completed_at)
+                        <span class="d-flex items-center gap-1 text-green-600">@svg('heroicon-o-check-circle', 'w-3.5 h-3.5') {{ $instance->completed_at->format('d.m.Y H:i') }}</span>
+                        @endif
+                    </div>
+                    @if($instance->description)
+                    <p class="text-sm text-[var(--ui-muted)] leading-relaxed mt-2">{{ $instance->description }}</p>
+                    @endif
+                </div>
+            </x-ui-panel>
+
             {{-- Completion Bar --}}
             <x-ui-panel>
                 <div class="p-5">
@@ -158,102 +204,4 @@
             @endif
         </div>
     </x-ui-page-container>
-
-    {{-- Left Sidebar --}}
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Details" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Status</h3>
-                    <x-ui-badge :variant="match($instance->status) {
-                        'completed' => 'success',
-                        'in_progress' => 'info',
-                        'cancelled' => 'danger',
-                        default => 'warning',
-                    }">
-                        {{ match($instance->status) {
-                            'open' => 'Offen',
-                            'in_progress' => 'In Bearbeitung',
-                            'completed' => 'Abgeschlossen',
-                            'cancelled' => 'Abgebrochen',
-                            default => ucfirst($instance->status),
-                        } }}
-                    </x-ui-badge>
-                </div>
-
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Info</h3>
-                    <div class="space-y-2">
-                        @if($instance->template)
-                        <a href="{{ route('qm.templates.show', $instance->template) }}" class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]/80 transition-colors" wire:navigate>
-                            <span class="text-xs text-[var(--ui-muted)]">Template</span>
-                            <span class="text-xs font-medium text-[var(--ui-secondary)]">{{ $instance->template->name }}</span>
-                        </a>
-                        @endif
-
-                        @if($instance->score !== null)
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Score</span>
-                            <span class="text-sm font-bold {{ $instance->score >= 80 ? 'text-green-600' : ($instance->score >= 50 ? 'text-yellow-600' : 'text-red-500') }}">
-                                {{ number_format($instance->score, 0) }}%
-                            </span>
-                        </div>
-                        @endif
-
-                        @if($instance->due_at)
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Faellig</span>
-                            <span class="text-xs {{ $instance->due_at->isPast() && !in_array($instance->status, ['completed', 'cancelled']) ? 'text-red-500 font-bold' : 'text-[var(--ui-secondary)]' }}">
-                                {{ $instance->due_at->format('d.m.Y H:i') }}
-                            </span>
-                        </div>
-                        @endif
-
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Antworten</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $stats['responses_count'] ?? 0 }} / {{ $stats['total_fields'] ?? 0 }}</span>
-                        </div>
-
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Abweichungen</span>
-                            <span class="text-sm font-bold {{ ($stats['deviations_count'] ?? 0) > 0 ? 'text-red-500' : 'text-[var(--ui-secondary)]' }}">{{ $stats['deviations_count'] ?? 0 }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                @if($instance->public_token)
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Public Link</h3>
-                    <div class="p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                        <span class="text-[10px] font-mono text-[var(--ui-muted)] break-all">{{ $instance->public_token }}</span>
-                    </div>
-                </div>
-                @endif
-
-                <div class="space-y-2 text-xs text-[var(--ui-muted)]">
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                        {{ $instance->createdByUser?->name ?? 'Unbekannt' }}
-                    </div>
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-calendar', 'w-3.5 h-3.5')
-                        {{ $instance->created_at?->format('d.m.Y H:i') }}
-                    </div>
-                    @if($instance->completed_at)
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
-                        Abgeschlossen: {{ $instance->completed_at->format('d.m.Y H:i') }}
-                    </div>
-                    @endif
-                </div>
-
-                @if($instance->description)
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Beschreibung</h3>
-                    <p class="text-xs text-[var(--ui-muted)] leading-relaxed">{{ $instance->description }}</p>
-                </div>
-                @endif
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

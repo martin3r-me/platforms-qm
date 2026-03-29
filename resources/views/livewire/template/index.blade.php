@@ -23,6 +23,17 @@
             {{-- Table --}}
             @if($templates->isNotEmpty())
             <x-ui-panel title="Templates" subtitle="{{ $stats['total'] }} Template(s) in diesem Team">
+                <div class="px-4 pt-3 pb-2 space-y-3">
+                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Template suchen..." size="sm" />
+                    <div class="d-flex items-center gap-1">
+                        @foreach(['' => 'Alle', 'draft' => 'Entwurf', 'active' => 'Aktiv', 'archived' => 'Archiviert'] as $key => $label)
+                        <button wire:click="setStatusFilter('{{ $key }}')"
+                            class="px-2.5 py-1 rounded-md text-xs transition-colors {{ $statusFilter === $key ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
+                            {{ $label }}
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
                 <x-ui-table compact="true">
                     <x-ui-table-header>
                         <x-ui-table-header-cell compact="true">Name</x-ui-table-header-cell>
@@ -83,54 +94,4 @@
             @endif
         </div>
     </x-ui-page-container>
-
-    {{-- Left Sidebar --}}
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Filter" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Suche</h3>
-                    <x-ui-input-text wire:model.live.debounce.300ms="search" placeholder="Template suchen..." size="sm" />
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-bold text-[var(--ui-secondary)] uppercase tracking-wider mb-3">Status</h3>
-                    <div class="space-y-1">
-                        <button wire:click="setStatusFilter('')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === '' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span class="d-flex items-center gap-2">
-                                @svg('heroicon-o-document-duplicate', 'w-3.5 h-3.5')
-                                Alle
-                            </span>
-                            <span>{{ $stats['total'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('draft')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'draft' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span class="d-flex items-center gap-2">
-                                @svg('heroicon-o-pencil-square', 'w-3.5 h-3.5')
-                                Entwurf
-                            </span>
-                            <span>{{ $stats['draft'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('active')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'active' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span class="d-flex items-center gap-2">
-                                @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
-                                Aktiv
-                            </span>
-                            <span>{{ $stats['active'] }}</span>
-                        </button>
-                        <button wire:click="setStatusFilter('archived')"
-                            class="d-flex items-center justify-between w-full p-2 rounded-md text-xs transition-colors {{ $statusFilter === 'archived' ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                            <span class="d-flex items-center gap-2">
-                                @svg('heroicon-o-archive-box', 'w-3.5 h-3.5')
-                                Archiviert
-                            </span>
-                            <span>{{ $stats['archived'] }}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

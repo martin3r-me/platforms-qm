@@ -15,6 +15,13 @@
         <div class="space-y-6">
             {{-- Info --}}
             <x-ui-panel title="{{ $fieldType->label }}" subtitle="Feldtyp: {{ $fieldType->key }}">
+                <div class="px-5 pt-3 d-flex items-center gap-3 text-xs text-[var(--ui-muted)]">
+                    <x-ui-badge :variant="$fieldType->is_system ? 'info' : 'warning'" size="sm">
+                        {{ $fieldType->is_system ? 'System' : 'Custom' }}
+                    </x-ui-badge>
+                    <span class="font-mono font-bold text-[var(--ui-secondary)]">{{ $fieldType->key }}</span>
+                    <span>{{ $fieldType->field_definitions_count }} Definitionen</span>
+                </div>
                 <div class="p-5 space-y-4">
                     @if($fieldType->description)
                         <p class="text-sm text-[var(--ui-muted)]">{{ $fieldType->description }}</p>
@@ -64,30 +71,4 @@
             </x-ui-panel>
         </div>
     </x-ui-page-container>
-
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Details" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Info</h3>
-                    <div class="space-y-2">
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Typ</span>
-                            <x-ui-badge :variant="$fieldType->is_system ? 'info' : 'warning'" size="sm">
-                                {{ $fieldType->is_system ? 'System' : 'Custom' }}
-                            </x-ui-badge>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Key</span>
-                            <span class="text-xs font-mono font-bold text-[var(--ui-secondary)]">{{ $fieldType->key }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Definitionen</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $fieldType->field_definitions_count }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

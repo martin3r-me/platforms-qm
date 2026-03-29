@@ -13,6 +13,39 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Template Info --}}
+            <x-ui-panel>
+                <div class="p-4 space-y-4">
+                    <div class="d-flex items-start justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            @if($template->description)
+                            <p class="text-sm text-[var(--ui-muted)] leading-relaxed">{{ $template->description }}</p>
+                            @endif
+                        </div>
+                        <div class="d-flex items-center gap-2 flex-shrink-0">
+                            <x-ui-badge :variant="match($template->status) { 'active' => 'success', 'archived' => 'secondary', default => 'warning' }">
+                                {{ ucfirst($template->status) }}
+                            </x-ui-badge>
+                            <span class="text-xs font-mono text-[var(--ui-muted)]">v{{ $template->version }}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex items-center gap-4 flex-wrap text-xs text-[var(--ui-muted)]">
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-rectangle-group', 'w-3.5 h-3.5') {{ $template->templateSections->count() }} Sektionen</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5') {{ $template->instances_count }} Instanzen</span>
+                        @if($template->getSetting('haccp_enabled'))
+                        <x-ui-badge variant="info" size="sm">HACCP</x-ui-badge>
+                        @endif
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-cog-6-tooth', 'w-3.5 h-3.5') {{ $template->getSetting('deviation_workflow') }}-Workflow</span>
+                        @if($template->getSetting('require_signature'))
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-pencil', 'w-3.5 h-3.5') Unterschrift</span>
+                        @endif
+                        <span class="text-[var(--ui-border)]">|</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-user', 'w-3.5 h-3.5') {{ $template->createdByUser?->name ?? 'Unbekannt' }}</span>
+                        <span>{{ $template->created_at?->format('d.m.Y') }}</span>
+                    </div>
+                </div>
+            </x-ui-panel>
+
             {{-- Wizard Configuration Link --}}
             @if($template->wizardFields->isNotEmpty())
             <x-ui-panel>
@@ -99,83 +132,4 @@
             @endif
         </div>
     </x-ui-page-container>
-
-    {{-- Left Sidebar --}}
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Template Info" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Status</h3>
-                    <x-ui-badge :variant="match($template->status) { 'active' => 'success', 'archived' => 'secondary', default => 'warning' }">
-                        {{ ucfirst($template->status) }}
-                    </x-ui-badge>
-                </div>
-
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Version</span>
-                            <span class="text-xs font-mono font-bold text-[var(--ui-secondary)]">{{ $template->version }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Sektionen</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $template->templateSections->count() }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Instanzen</span>
-                            <span class="text-sm font-bold text-[var(--ui-secondary)]">{{ $template->instances_count }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Settings --}}
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Settings</h3>
-                    <div class="space-y-2">
-                        <div class="d-flex items-center justify-between p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="text-[11px] text-[var(--ui-muted)]">HACCP</span>
-                            <x-ui-badge :variant="$template->getSetting('haccp_enabled') ? 'success' : 'secondary'" size="sm">
-                                {{ $template->getSetting('haccp_enabled') ? 'Aktiv' : 'Aus' }}
-                            </x-ui-badge>
-                        </div>
-                        <div class="d-flex items-center justify-between p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="text-[11px] text-[var(--ui-muted)]">Workflow</span>
-                            <span class="text-[11px] font-mono text-[var(--ui-secondary)]">{{ $template->getSetting('deviation_workflow') }}</span>
-                        </div>
-                        <div class="d-flex items-center justify-between p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="text-[11px] text-[var(--ui-muted)]">Unterschrift</span>
-                            <x-ui-badge :variant="$template->getSetting('require_signature') ? 'success' : 'secondary'" size="sm">
-                                {{ $template->getSetting('require_signature') ? 'Ja' : 'Nein' }}
-                            </x-ui-badge>
-                        </div>
-                        <div class="d-flex items-center justify-between p-2 bg-[var(--ui-muted-5)] rounded-md border border-[var(--ui-border)]/40">
-                            <span class="text-[11px] text-[var(--ui-muted)]">Eskalation</span>
-                            <x-ui-badge :variant="$template->getSetting('escalation_enabled') ? 'success' : 'secondary'" size="sm">
-                                {{ $template->getSetting('escalation_enabled') ? 'Aktiv' : 'Aus' }}
-                            </x-ui-badge>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-2 text-xs text-[var(--ui-muted)]">
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                        {{ $template->createdByUser?->name ?? 'Unbekannt' }}
-                    </div>
-                    <div class="d-flex items-center gap-2">
-                        @svg('heroicon-o-calendar', 'w-3.5 h-3.5')
-                        {{ $template->created_at?->format('d.m.Y H:i') }}
-                    </div>
-                </div>
-
-                @if($template->description)
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Beschreibung</h3>
-                    <p class="text-xs text-[var(--ui-muted)] leading-relaxed">{{ $template->description }}</p>
-                </div>
-                @endif
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>

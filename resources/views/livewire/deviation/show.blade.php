@@ -13,6 +13,40 @@
 
     <x-ui-page-container>
         <div class="space-y-6">
+            {{-- Deviation Info --}}
+            <x-ui-panel>
+                <div class="p-4">
+                    <div class="d-flex items-center gap-3 flex-wrap text-xs text-[var(--ui-muted)]">
+                        <x-ui-badge :variant="match($deviation->severity ?? 'low') {
+                            'critical' => 'danger', 'high' => 'danger', 'medium' => 'warning', default => 'secondary',
+                        }">
+                            {{ ucfirst($deviation->severity ?? 'low') }}
+                        </x-ui-badge>
+                        <x-ui-badge :variant="match($deviation->status ?? 'open') {
+                            'resolved' => 'success', 'verified' => 'success', 'acknowledged' => 'info', default => 'warning',
+                        }">
+                            {{ match($deviation->status ?? 'open') {
+                                'open' => 'Offen', 'acknowledged' => 'Bestaetigt', 'resolved' => 'Behoben', 'verified' => 'Verifiziert', default => ucfirst($deviation->status),
+                            } }}
+                        </x-ui-badge>
+                        @if($deviation->escalation_level)
+                        <x-ui-badge variant="danger" size="sm">Eskalation Level {{ $deviation->escalation_level }}</x-ui-badge>
+                        @endif
+                        @if($deviation->instance)
+                        <a href="{{ route('qm.instances.show', $deviation->instance) }}" wire:navigate class="d-flex items-center gap-1 hover:text-[var(--ui-secondary)] transition-colors">
+                            @svg('heroicon-o-clipboard-document-list', 'w-3.5 h-3.5') {{ $deviation->instance->title }}
+                        </a>
+                        @endif
+                        @if($deviation->response?->fieldDefinition)
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-adjustments-horizontal', 'w-3.5 h-3.5') {{ $deviation->response->fieldDefinition->title }}</span>
+                        @endif
+                        <span class="text-[var(--ui-border)]">|</span>
+                        <span class="d-flex items-center gap-1">@svg('heroicon-o-user', 'w-3.5 h-3.5') {{ $deviation->createdByUser?->name ?? 'Unbekannt' }}</span>
+                        <span>{{ $deviation->created_at?->format('d.m.Y H:i') }}</span>
+                    </div>
+                </div>
+            </x-ui-panel>
+
             {{-- Workflow Timeline --}}
             <x-ui-panel title="Workflow" subtitle="{{ $deviation->workflow_type === 'full' ? 'HACCP (vollstaendig)' : 'Einfach' }}">
                 <div class="p-5">
@@ -87,103 +121,4 @@
             </x-ui-panel>
         </div>
     </x-ui-page-container>
-
-    {{-- Left Sidebar --}}
-    <x-slot name="sidebar">
-        <x-ui-page-sidebar title="Info" width="w-72" :defaultOpen="true">
-            <div class="p-5 space-y-5">
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Schwere</h3>
-                    <x-ui-badge :variant="match($deviation->severity ?? 'low') {
-                        'critical' => 'danger',
-                        'high' => 'danger',
-                        'medium' => 'warning',
-                        default => 'secondary',
-                    }">
-                        {{ ucfirst($deviation->severity ?? 'low') }}
-                    </x-ui-badge>
-                </div>
-
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Details</h3>
-                    <div class="space-y-2">
-                        @if($deviation->instance)
-                        <a href="{{ route('qm.instances.show', $deviation->instance) }}" class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40 hover:bg-[var(--ui-muted-5)]/80 transition-colors" wire:navigate>
-                            <span class="text-xs text-[var(--ui-muted)]">Checkliste</span>
-                            <span class="text-xs font-medium text-[var(--ui-secondary)]">{{ $deviation->instance->title }}</span>
-                        </a>
-                        @endif
-
-                        @if($deviation->response?->fieldDefinition)
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Feld</span>
-                            <span class="text-xs text-[var(--ui-secondary)]">{{ $deviation->response->fieldDefinition->title }}</span>
-                        </div>
-                        @endif
-
-                        @if($deviation->escalation_level)
-                        <div class="d-flex items-center justify-between p-3 bg-[var(--ui-muted-5)] rounded-lg border border-[var(--ui-border)]/40">
-                            <span class="text-xs text-[var(--ui-muted)]">Eskalation</span>
-                            <x-ui-badge variant="danger" size="sm">Level {{ $deviation->escalation_level }}</x-ui-badge>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--ui-muted)] mb-3">Zeitverlauf</h3>
-                    <div class="space-y-2 text-xs">
-                        <div class="d-flex items-center gap-2 text-[var(--ui-muted)]">
-                            @svg('heroicon-o-plus-circle', 'w-3.5 h-3.5')
-                            <span>Erstellt: {{ $deviation->created_at?->format('d.m.Y H:i') }}</span>
-                        </div>
-                        <div class="d-flex items-center gap-2 text-[var(--ui-muted)]">
-                            @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                            <span>{{ $deviation->createdByUser?->name ?? 'Unbekannt' }}</span>
-                        </div>
-
-                        @if($deviation->acknowledged_at)
-                        <div class="d-flex items-center gap-2 text-blue-500 mt-2">
-                            @svg('heroicon-o-eye', 'w-3.5 h-3.5')
-                            <span>Bestaetigt: {{ $deviation->acknowledged_at->format('d.m.Y H:i') }}</span>
-                        </div>
-                        <div class="d-flex items-center gap-2 text-[var(--ui-muted)]">
-                            @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                            <span>{{ $deviation->acknowledgedByUser?->name }}</span>
-                        </div>
-                        @endif
-
-                        @if($deviation->escalated_at)
-                        <div class="d-flex items-center gap-2 text-red-500 mt-2">
-                            @svg('heroicon-o-arrow-trending-up', 'w-3.5 h-3.5')
-                            <span>Eskaliert: {{ $deviation->escalated_at->format('d.m.Y H:i') }}</span>
-                        </div>
-                        @endif
-
-                        @if($deviation->resolved_at)
-                        <div class="d-flex items-center gap-2 text-green-500 mt-2">
-                            @svg('heroicon-o-check-circle', 'w-3.5 h-3.5')
-                            <span>Behoben: {{ $deviation->resolved_at->format('d.m.Y H:i') }}</span>
-                        </div>
-                        <div class="d-flex items-center gap-2 text-[var(--ui-muted)]">
-                            @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                            <span>{{ $deviation->resolvedByUser?->name }}</span>
-                        </div>
-                        @endif
-
-                        @if($deviation->verified_at)
-                        <div class="d-flex items-center gap-2 text-green-600 mt-2">
-                            @svg('heroicon-o-check-badge', 'w-3.5 h-3.5')
-                            <span>Verifiziert: {{ $deviation->verified_at->format('d.m.Y H:i') }}</span>
-                        </div>
-                        <div class="d-flex items-center gap-2 text-[var(--ui-muted)]">
-                            @svg('heroicon-o-user', 'w-3.5 h-3.5')
-                            <span>{{ $deviation->verifiedByUser?->name }}</span>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </x-ui-page-sidebar>
-    </x-slot>
 </x-ui-page>
