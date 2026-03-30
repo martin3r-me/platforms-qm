@@ -27,6 +27,17 @@ class Create extends Component
 
         $this->template = $template;
         $this->instanceTitle = $template->name . ' - ' . now()->format('d.m.Y');
+
+        // Pre-initialize answer keys so Livewire can bind properly
+        $service = new QmWizardService();
+        $config = $service->getWizardConfig($template);
+        foreach ($config['fields'] as $field) {
+            if ($field['input_type'] === 'multi_select') {
+                $this->answers[$field['technical_name']] = [];
+            } else {
+                $this->answers[$field['technical_name']] = '';
+            }
+        }
     }
 
     public function updatedAnswers(): void
@@ -41,11 +52,22 @@ class Create extends Component
         $config = $service->getWizardConfig($this->template);
 
         // Validate required fields
+        $this->resetErrorBag();
+        $hasErrors = false;
+
         foreach ($config['fields'] as $field) {
-            if ($field['is_required'] && empty($this->answers[$field['technical_name']] ?? null)) {
-                $this->addError('answers.' . $field['technical_name'], 'Dieses Feld ist erforderlich.');
-                return;
+            if ($field['is_required']) {
+                $value = $this->answers[$field['technical_name']] ?? null;
+                $isEmpty = $value === null || $value === '' || $value === [];
+                if ($isEmpty) {
+                    $this->addError('answers.' . $field['technical_name'], 'Dieses Feld ist erforderlich.');
+                    $hasErrors = true;
+                }
             }
+        }
+
+        if ($hasErrors) {
+            return;
         }
 
         $this->evaluation = $service->evaluateWizard($this->template, $this->answers);

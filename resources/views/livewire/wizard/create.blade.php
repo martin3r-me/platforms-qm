@@ -79,11 +79,11 @@
                                 Ja
                             </label>
                         @elseif($field['input_type'] === 'number')
-                            <x-ui-input-text type="number" wire:model.live="answers.{{ $field['technical_name'] }}" />
+                            <x-ui-input-text name="answers_{{ $field['technical_name'] }}" type="number" wire:model.live="answers.{{ $field['technical_name'] }}" />
                         @elseif($field['input_type'] === 'date')
-                            <x-ui-input-text type="date" wire:model.live="answers.{{ $field['technical_name'] }}" />
+                            <x-ui-input-text name="answers_{{ $field['technical_name'] }}" type="date" wire:model.live="answers.{{ $field['technical_name'] }}" />
                         @else
-                            <x-ui-input-text wire:model.live="answers.{{ $field['technical_name'] }}" />
+                            <x-ui-input-text name="answers_{{ $field['technical_name'] }}" wire:model.live="answers.{{ $field['technical_name'] }}" />
                         @endif
 
                         @error('answers.' . $field['technical_name'])
