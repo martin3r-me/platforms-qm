@@ -57,11 +57,12 @@
                                 :options="collect($field['lookup_table']['entries'])->map(fn($e) => ['value' => $e['value'], 'label' => $e['label']])->toArray()"
                                 :nullable="true"
                                 nullLabel="-- Bitte waehlen --"
+                                displayMode="dropdown"
                             />
                         @elseif($field['input_type'] === 'multi_select' && !empty($field['lookup_table']['entries']))
                             <div class="space-y-2">
                                 @foreach($field['lookup_table']['entries'] as $entry)
-                                <label class="d-flex items-center gap-2 cursor-pointer text-sm text-[var(--ui-secondary)]">
+                                <label class="d-flex items-center gap-2 cursor-pointer text-sm text-[var(--ui-secondary)] py-1.5 px-3 rounded-lg hover:bg-[var(--ui-muted-5)] transition-colors">
                                     <input type="checkbox"
                                         wire:model.live="answers.{{ $field['technical_name'] }}"
                                         value="{{ $entry['value'] }}"
