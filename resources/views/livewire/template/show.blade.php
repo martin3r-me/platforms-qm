@@ -57,9 +57,14 @@
                             <div class="text-xs text-[var(--ui-muted)]">{{ $template->wizardFields->count() }} Feld(er), {{ $template->wizardRules->count() }} Regel(n)</div>
                         </div>
                     </div>
-                    <a href="{{ route('qm.wizard.show', $template) }}" wire:navigate>
-                        <x-ui-button variant="secondary" size="sm">Wizard anzeigen</x-ui-button>
-                    </a>
+                    <div class="d-flex items-center gap-2">
+                        <a href="{{ route('qm.wizard.show', $template) }}" wire:navigate>
+                            <x-ui-button variant="secondary" size="sm">Wizard anzeigen</x-ui-button>
+                        </a>
+                        <a href="{{ route('qm.wizard.create', $template) }}" wire:navigate>
+                            <x-ui-button variant="primary" size="sm">Neue Checkliste erstellen</x-ui-button>
+                        </a>
+                    </div>
                 </div>
             </x-ui-panel>
             @endif

@@ -59,7 +59,7 @@
                 </div>
             </x-ui-panel>
 
-            {{-- Completion Bar --}}
+            {{-- Progress Bar --}}
             <x-ui-panel>
                 <div class="p-5">
                     <div class="d-flex items-center justify-between mb-2">
@@ -82,90 +82,96 @@
                 </div>
             </x-ui-panel>
 
-            {{-- Sections with Responses --}}
-            @forelse($sections as $section)
-            <x-ui-panel
-                title="{{ $section['title'] }}"
-                subtitle="{{ count($section['fields']) }} Feld(er)"
-            >
-                @if($section['description'])
-                    <div class="px-5 pt-3 text-xs text-[var(--ui-muted)]">{{ $section['description'] }}</div>
-                @endif
+            {{-- Phase Tabs --}}
+            @if(count($phases) > 1)
+            <div class="d-flex items-center gap-1 flex-wrap">
+                @foreach($phases as $phaseKey => $phase)
+                <button wire:click="setPhase('{{ $phaseKey }}')"
+                    class="px-3 py-1.5 rounded-md text-xs transition-colors d-flex items-center gap-1.5 {{ $activePhase === $phaseKey ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
+                    {{ $phaseKey }}
+                    <span class="font-mono {{ $phase['answered_fields'] === $phase['total_fields'] && $phase['total_fields'] > 0 ? 'text-green-600' : '' }}">
+                        {{ $phase['answered_fields'] }}/{{ $phase['total_fields'] }}
+                    </span>
+                </button>
+                @endforeach
+            </div>
+            @endif
 
-                @if(!empty($section['fields']))
-                <x-ui-table compact="true">
-                    <x-ui-table-header>
-                        <x-ui-table-header-cell compact="true">Feld</x-ui-table-header-cell>
-                        <x-ui-table-header-cell compact="true">Typ</x-ui-table-header-cell>
-                        <x-ui-table-header-cell compact="true">Antwort</x-ui-table-header-cell>
-                        <x-ui-table-header-cell compact="true">Status</x-ui-table-header-cell>
-                        <x-ui-table-header-cell compact="true">Beantwortet</x-ui-table-header-cell>
-                    </x-ui-table-header>
-                    <x-ui-table-body>
+            {{-- Sections for active phase --}}
+            @php $activePhaseData = $phases[$activePhase] ?? reset($phases); @endphp
+            @if($activePhaseData)
+                @foreach($activePhaseData['sections'] as $section)
+                <x-ui-panel>
+                    <div class="px-5 pt-4 pb-2 d-flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $section['title'] }}</h3>
+                            @if($section['description'])
+                            <p class="text-xs text-[var(--ui-muted)] mt-0.5">{{ $section['description'] }}</p>
+                            @endif
+                        </div>
+                        <span class="text-xs font-mono {{ $section['answered'] === $section['total'] && $section['total'] > 0 ? 'text-green-600' : 'text-[var(--ui-muted)]' }}">
+                            {{ $section['answered'] }}/{{ $section['total'] }}
+                        </span>
+                    </div>
+                    <div class="px-5 pb-4 space-y-1">
                         @foreach($section['fields'] as $field)
-                        <x-ui-table-row compact="true">
-                            <x-ui-table-cell compact="true">
-                                <div class="font-medium text-[var(--ui-secondary)]">{{ $field['title'] }}</div>
-                                @if($field['is_required'])
-                                <span class="text-[10px] text-red-500">Pflicht</span>
+                        <div
+                            @if(!in_array($instance->status, ['completed', 'cancelled']))
+                            wire:click="toggleField({{ $field['field_definition_id'] }}, {{ $section['section_id'] }})"
+                            @endif
+                            class="d-flex items-center gap-3 py-2 px-3 rounded-lg transition-colors {{ !in_array($instance->status, ['completed', 'cancelled']) ? 'cursor-pointer hover:bg-[var(--ui-muted-5)]' : '' }} {{ $field['is_checked'] ? 'bg-green-500/5' : '' }}"
+                        >
+                            {{-- Checkbox --}}
+                            <div class="flex-shrink-0 w-5 h-5 rounded border-2 d-flex items-center justify-center transition-colors {{ $field['is_checked'] ? 'bg-green-500 border-green-500' : 'border-[var(--ui-border)]' }}">
+                                @if($field['is_checked'])
+                                @svg('heroicon-s-check', 'w-3.5 h-3.5 text-white')
                                 @endif
-                            </x-ui-table-cell>
-                            <x-ui-table-cell compact="true">
-                                <x-ui-badge variant="secondary" size="sm">{{ $field['field_type'] }}</x-ui-badge>
-                            </x-ui-table-cell>
-                            <x-ui-table-cell compact="true">
-                                @if($field['response'])
-                                    @php $val = $field['response']->value; @endphp
-                                    <span class="text-sm text-[var(--ui-secondary)]">
-                                        @if(is_array($val))
-                                            {{ json_encode($val) }}
-                                        @else
-                                            {{ $val }}
-                                        @endif
-                                    </span>
-                                    @if($field['response']->notes)
-                                    <div class="text-[10px] text-[var(--ui-muted)] mt-0.5">{{ $field['response']->notes }}</div>
-                                    @endif
-                                @else
-                                    <span class="text-xs text-[var(--ui-muted)]">-</span>
-                                @endif
-                            </x-ui-table-cell>
-                            <x-ui-table-cell compact="true">
-                                @if($field['response'])
-                                    @if($field['response']->is_deviation)
-                                        <x-ui-badge variant="danger" size="sm">Abweichung</x-ui-badge>
-                                    @else
-                                        <x-ui-badge variant="success" size="sm">OK</x-ui-badge>
-                                    @endif
-                                @else
-                                    <x-ui-badge variant="secondary" size="sm">Offen</x-ui-badge>
-                                @endif
-                            </x-ui-table-cell>
-                            <x-ui-table-cell compact="true">
-                                @if($field['response'])
-                                <div class="text-xs text-[var(--ui-muted)]">
-                                    {{ $field['response']->respondedByUser?->name ?? '-' }}
-                                </div>
-                                <div class="text-[10px] text-[var(--ui-muted)]">
-                                    {{ $field['response']->responded_at?->format('d.m.Y H:i') }}
-                                </div>
-                                @else
-                                <span class="text-xs text-[var(--ui-muted)]">-</span>
-                                @endif
-                            </x-ui-table-cell>
-                        </x-ui-table-row>
+                            </div>
+
+                            {{-- Field title --}}
+                            <div class="flex-grow-1 min-w-0">
+                                <span class="text-sm {{ $field['is_checked'] ? 'text-[var(--ui-muted)] line-through' : 'text-[var(--ui-secondary)]' }}">
+                                    {{ $field['title'] }}
+                                </span>
+                            </div>
+
+                            {{-- Required marker --}}
+                            @if($field['is_required'] && !$field['is_checked'])
+                            <span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" title="Pflichtfeld"></span>
+                            @endif
+
+                            {{-- Response info --}}
+                            @if($field['response']?->responded_by_user_id)
+                            <span class="text-[10px] text-[var(--ui-muted)] flex-shrink-0">
+                                {{ $field['response']->responded_at?->format('d.m. H:i') }}
+                            </span>
+                            @endif
+                        </div>
                         @endforeach
-                    </x-ui-table-body>
-                </x-ui-table>
-                @endif
-            </x-ui-panel>
-            @empty
+                    </div>
+                </x-ui-panel>
+                @endforeach
+            @else
             <x-ui-panel>
                 <div class="p-8 text-center text-[var(--ui-muted)] text-sm">
                     Kein Snapshot vorhanden. Diese Instanz hat keine Template-Struktur.
                 </div>
             </x-ui-panel>
-            @endforelse
+            @endif
+
+            {{-- Complete Button --}}
+            @if(!in_array($instance->status, ['completed', 'cancelled']))
+            <div class="d-flex justify-end">
+                <x-ui-button
+                    wire:click="completeInstance"
+                    wire:confirm="Checkliste wirklich abschliessen? Dies kann nicht rueckgaengig gemacht werden."
+                    variant="{{ $allRequiredAnswered ? 'primary' : 'secondary' }}"
+                    :disabled="!$allRequiredAnswered"
+                >
+                    Checkliste abschliessen
+                </x-ui-button>
+            </div>
+            @endif
 
             {{-- Deviations --}}
             @if($instance->deviations->isNotEmpty())

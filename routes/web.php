@@ -16,6 +16,7 @@ use Platform\Qm\Livewire\Deviation\Show as DeviationShow;
 use Platform\Qm\Livewire\Lookup\Index as LookupIndex;
 use Platform\Qm\Livewire\Lookup\Show as LookupShow;
 use Platform\Qm\Livewire\Wizard\Show as WizardShow;
+use Platform\Qm\Livewire\Wizard\Create as WizardCreate;
 
 Route::get('/', Dashboard::class)->name('qm.dashboard');
 
@@ -40,3 +41,4 @@ Route::get('/deviations/{deviation}', DeviationShow::class)->name('qm.deviations
 Route::get('/lookups', LookupIndex::class)->name('qm.lookups.index');
 Route::get('/lookups/{lookupTable}', LookupShow::class)->name('qm.lookups.show');
 Route::get('/templates/{template}/wizard', WizardShow::class)->name('qm.wizard.show');
+Route::get('/templates/{template}/wizard/create', WizardCreate::class)->name('qm.wizard.create');
