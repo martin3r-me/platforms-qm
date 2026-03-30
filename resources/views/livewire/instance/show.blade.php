@@ -12,7 +12,7 @@
     </x-slot>
 
     <x-ui-page-container>
-        <div class="space-y-6">
+        <div class="space-y-4">
 
             {{-- Hero: Instance Info + Progress --}}
             <x-ui-panel>
@@ -78,91 +78,118 @@
                 </div>
             </x-ui-panel>
 
-            {{-- Phase Tabs --}}
-            @if(count($phases) > 1)
-            <div class="d-flex items-center gap-1 flex-wrap">
-                @foreach($phases as $phaseKey => $phase)
-                <button wire:click="setPhase('{{ $phaseKey }}')"
-                    class="px-3 py-1.5 rounded-md text-xs transition-colors d-flex items-center gap-1.5 {{ $activePhase === $phaseKey ? 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)] font-medium' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]' }}">
-                    {{ $phaseKey }}
-                    <span class="font-mono {{ $phase['answered_fields'] === $phase['total_fields'] && $phase['total_fields'] > 0 ? 'text-green-600' : '' }}">
-                        {{ $phase['answered_fields'] }}/{{ $phase['total_fields'] }}
-                    </span>
-                </button>
-                @endforeach
+            @if(count($sections) > 0)
+            {{-- Sticky Section Tab Bar --}}
+            <div class="sticky top-0 z-10 -mx-1 px-1 py-2 bg-[var(--ui-bg)]">
+                <div class="overflow-x-auto scrollbar-none">
+                    <div class="d-flex items-center gap-1 min-w-max">
+                        @foreach($sections as $sIdx => $section)
+                        <button wire:click="setSection({{ $sIdx }})"
+                            class="px-3 py-2 rounded-lg text-xs transition-all d-flex items-center gap-2 whitespace-nowrap {{ $activeSection === $sIdx ? 'bg-[var(--ui-primary)] text-white shadow-sm' : ($section['answered'] === $section['total'] && $section['total'] > 0 ? 'bg-green-500/10 text-green-700 hover:bg-green-500/20' : 'text-[var(--ui-muted)] hover:bg-[var(--ui-muted-5)] hover:text-[var(--ui-secondary)]') }}">
+                            {{-- Section number or check --}}
+                            @if($section['answered'] === $section['total'] && $section['total'] > 0 && $activeSection !== $sIdx)
+                                @svg('heroicon-s-check-circle', 'w-3.5 h-3.5')
+                            @else
+                                <span class="w-5 h-5 rounded-full d-flex items-center justify-center text-[10px] font-bold {{ $activeSection === $sIdx ? 'bg-white/20' : 'bg-[var(--ui-muted-5)]' }}">{{ $sIdx + 1 }}</span>
+                            @endif
+                            <span class="font-medium">{{ \Illuminate\Support\Str::limit($section['title'], 20) }}</span>
+                            <span class="font-mono text-[10px] {{ $activeSection === $sIdx ? 'text-white/70' : '' }}">{{ $section['answered'] }}/{{ $section['total'] }}</span>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
             </div>
-            @endif
 
-            {{-- Checklist Sections --}}
-            @php $activePhaseData = $phases[$activePhase] ?? reset($phases); @endphp
-            @if($activePhaseData)
+            {{-- Active Section Content --}}
+            @php $currentSection = $sections[$activeSection] ?? null; @endphp
+            @if($currentSection)
             <x-ui-panel>
-                <div class="divide-y divide-[var(--ui-border)]/40">
-                    @foreach($activePhaseData['sections'] as $sIdx => $section)
-                    <div class="{{ $sIdx > 0 ? 'pt-1' : '' }}">
-                        {{-- Section Header --}}
-                        <div class="px-5 pt-4 pb-2 d-flex items-center justify-between">
-                            <div class="d-flex items-center gap-2.5">
-                                <span class="w-6 h-6 rounded-full d-flex items-center justify-center text-[10px] font-bold {{ $section['answered'] === $section['total'] && $section['total'] > 0 ? 'bg-green-500 text-white' : 'bg-[var(--ui-muted-5)] text-[var(--ui-muted)]' }}">
-                                    @if($section['answered'] === $section['total'] && $section['total'] > 0)
-                                        @svg('heroicon-s-check', 'w-3.5 h-3.5')
-                                    @else
-                                        {{ $sIdx + 1 }}
-                                    @endif
-                                </span>
-                                <div>
-                                    <h3 class="text-sm font-semibold text-[var(--ui-secondary)]">{{ $section['title'] }}</h3>
-                                    @if($section['description'])
-                                    <p class="text-[11px] text-[var(--ui-muted)] mt-0.5">{{ $section['description'] }}</p>
-                                    @endif
-                                </div>
+                {{-- Section Header --}}
+                <div class="px-5 pt-5 pb-3 border-b border-[var(--ui-border)]/30">
+                    <div class="d-flex items-center justify-between">
+                        <div class="d-flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full d-flex items-center justify-center text-xs font-bold {{ $currentSection['answered'] === $currentSection['total'] && $currentSection['total'] > 0 ? 'bg-green-500 text-white' : 'bg-[var(--ui-primary)]/10 text-[var(--ui-primary)]' }}">
+                                @if($currentSection['answered'] === $currentSection['total'] && $currentSection['total'] > 0)
+                                    @svg('heroicon-s-check', 'w-4 h-4')
+                                @else
+                                    {{ $activeSection + 1 }}
+                                @endif
+                            </span>
+                            <div>
+                                <h3 class="text-base font-semibold text-[var(--ui-secondary)]">{{ $currentSection['title'] }}</h3>
+                                @if($currentSection['description'])
+                                <p class="text-xs text-[var(--ui-muted)] mt-0.5">{{ $currentSection['description'] }}</p>
+                                @endif
                             </div>
-                            <span class="text-xs font-mono {{ $section['answered'] === $section['total'] && $section['total'] > 0 ? 'text-green-600 font-bold' : 'text-[var(--ui-muted)]' }}">
-                                {{ $section['answered'] }}/{{ $section['total'] }}
+                        </div>
+                        <div class="d-flex items-center gap-2">
+                            <span class="text-xs text-[var(--ui-muted)]">{{ $currentSection['phase_label'] }}</span>
+                            <span class="text-sm font-mono font-bold {{ $currentSection['answered'] === $currentSection['total'] && $currentSection['total'] > 0 ? 'text-green-600' : 'text-[var(--ui-muted)]' }}">
+                                {{ $currentSection['answered'] }}/{{ $currentSection['total'] }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Fields / Checklist Items --}}
+                <div class="divide-y divide-[var(--ui-border)]/20">
+                    @foreach($currentSection['fields'] as $field)
+                    <div
+                        @if(!in_array($instance->status, ['completed', 'cancelled']))
+                        wire:click="toggleField({{ $field['field_definition_id'] }}, {{ $currentSection['section_id'] }})"
+                        @endif
+                        class="d-flex items-center gap-3 py-3 px-5 transition-colors {{ !in_array($instance->status, ['completed', 'cancelled']) ? 'cursor-pointer hover:bg-[var(--ui-muted-5)]/60' : '' }} {{ $field['is_checked'] ? 'bg-green-500/5' : '' }}"
+                    >
+                        {{-- Checkbox --}}
+                        <div class="flex-shrink-0 w-5 h-5 rounded border-2 d-flex items-center justify-center transition-all {{ $field['is_checked'] ? 'bg-green-500 border-green-500 shadow-sm' : 'border-[var(--ui-border)]' }}">
+                            @if($field['is_checked'])
+                            @svg('heroicon-s-check', 'w-3.5 h-3.5 text-white')
+                            @endif
+                        </div>
+
+                        {{-- Field title --}}
+                        <div class="flex-grow-1 min-w-0">
+                            <span class="text-sm {{ $field['is_checked'] ? 'text-[var(--ui-muted)] line-through' : 'text-[var(--ui-secondary)]' }}">
+                                {{ $field['title'] }}
                             </span>
                         </div>
 
-                        {{-- Fields --}}
-                        <div class="px-5 pb-4 space-y-0.5">
-                            @foreach($section['fields'] as $field)
-                            <div
-                                @if(!in_array($instance->status, ['completed', 'cancelled']))
-                                wire:click="toggleField({{ $field['field_definition_id'] }}, {{ $section['section_id'] }})"
-                                @endif
-                                class="d-flex items-center gap-3 py-2 px-3 rounded-lg transition-colors {{ !in_array($instance->status, ['completed', 'cancelled']) ? 'cursor-pointer hover:bg-[var(--ui-muted-5)]/80' : '' }} {{ $field['is_checked'] ? 'bg-green-500/5' : '' }}"
-                            >
-                                {{-- Checkbox --}}
-                                <div class="flex-shrink-0 w-5 h-5 rounded border-2 d-flex items-center justify-center transition-all {{ $field['is_checked'] ? 'bg-green-500 border-green-500 shadow-sm' : 'border-[var(--ui-border)]' }}">
-                                    @if($field['is_checked'])
-                                    @svg('heroicon-s-check', 'w-3.5 h-3.5 text-white')
-                                    @endif
-                                </div>
+                        {{-- Required marker --}}
+                        @if($field['is_required'] && !$field['is_checked'])
+                        <span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" title="Pflichtfeld"></span>
+                        @endif
 
-                                {{-- Field title --}}
-                                <div class="flex-grow-1 min-w-0">
-                                    <span class="text-sm {{ $field['is_checked'] ? 'text-[var(--ui-muted)] line-through' : 'text-[var(--ui-secondary)]' }}">
-                                        {{ $field['title'] }}
-                                    </span>
-                                </div>
-
-                                {{-- Required marker --}}
-                                @if($field['is_required'] && !$field['is_checked'])
-                                <span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" title="Pflichtfeld"></span>
-                                @endif
-
-                                {{-- Response timestamp --}}
-                                @if($field['response']?->responded_at)
-                                <span class="text-[10px] text-[var(--ui-muted)] flex-shrink-0">
-                                    {{ $field['response']->responded_at->format('d.m. H:i') }}
-                                </span>
-                                @endif
-                            </div>
-                            @endforeach
-                        </div>
+                        {{-- Response timestamp --}}
+                        @if($field['response']?->responded_at)
+                        <span class="text-[10px] text-[var(--ui-muted)] flex-shrink-0">
+                            {{ $field['response']->responded_at->format('d.m. H:i') }}
+                        </span>
+                        @endif
                     </div>
                     @endforeach
                 </div>
+
+                {{-- Prev/Next Navigation --}}
+                <div class="px-5 py-3 border-t border-[var(--ui-border)]/30 d-flex items-center justify-between">
+                    @if($activeSection > 0)
+                    <button wire:click="prevSection" class="d-flex items-center gap-1.5 text-xs text-[var(--ui-muted)] hover:text-[var(--ui-secondary)] transition-colors">
+                        @svg('heroicon-s-arrow-left', 'w-3.5 h-3.5')
+                        {{ \Illuminate\Support\Str::limit($sections[$activeSection - 1]['title'] ?? '', 25) }}
+                    </button>
+                    @else
+                    <div></div>
+                    @endif
+
+                    @if($activeSection < count($sections) - 1)
+                    <button wire:click="nextSection" class="d-flex items-center gap-1.5 text-xs text-[var(--ui-primary)] hover:text-[var(--ui-primary-dark)] font-medium transition-colors">
+                        {{ \Illuminate\Support\Str::limit($sections[$activeSection + 1]['title'] ?? '', 25) }}
+                        @svg('heroicon-s-arrow-right', 'w-3.5 h-3.5')
+                    </button>
+                    @endif
+                </div>
             </x-ui-panel>
+            @endif
+
             @else
             <x-ui-panel>
                 <div class="p-8 text-center text-[var(--ui-muted)] text-sm">

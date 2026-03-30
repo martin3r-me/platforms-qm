@@ -10,7 +10,7 @@ use Platform\Qm\Services\QmInstanceService;
 class Show extends Component
 {
     public QmInstance $instance;
-    public string $activePhase = '';
+    public int $activeSection = 0;
 
     public function mount(QmInstance $instance): void
     {
@@ -21,23 +21,27 @@ class Show extends Component
             'createdByUser:id,name',
             'completedByUser:id,name',
         ]);
+    }
 
-        // Set initial active phase from first section's phase_label
-        $snapshot = $this->instance->snapshot_data ?? [];
-        foreach ($snapshot['sections'] ?? [] as $sectionData) {
-            if (!empty($sectionData['phase_label'])) {
-                $this->activePhase = $sectionData['phase_label'];
-                break;
-            }
-        }
-        if (empty($this->activePhase)) {
-            $this->activePhase = 'Allgemein';
+    public function setSection(int $index): void
+    {
+        $this->activeSection = $index;
+    }
+
+    public function prevSection(): void
+    {
+        if ($this->activeSection > 0) {
+            $this->activeSection--;
         }
     }
 
-    public function setPhase(string $phase): void
+    public function nextSection(): void
     {
-        $this->activePhase = $phase;
+        $snapshot = $this->instance->snapshot_data ?? [];
+        $maxIndex = count($snapshot['sections'] ?? []) - 1;
+        if ($this->activeSection < $maxIndex) {
+            $this->activeSection++;
+        }
     }
 
     public function toggleField(int $fieldDefinitionId, int $sectionId): void
@@ -99,11 +103,11 @@ class Show extends Component
             return $r->qm_field_definition_id . '-' . $r->qm_section_id;
         });
 
-        // Build phases with sections and field data
-        $phases = [];
-        foreach ($snapshot['sections'] ?? [] as $sectionData) {
-            $phase = $sectionData['phase_label'] ?? 'Allgemein';
+        // Build flat sections array
+        $sections = [];
+        $allRequiredAnswered = true;
 
+        foreach ($snapshot['sections'] ?? [] as $sectionData) {
             $fields = [];
             $answeredCount = 0;
             foreach ($sectionData['fields'] ?? [] as $fieldData) {
@@ -112,6 +116,10 @@ class Show extends Component
                 $isChecked = $response !== null;
                 if ($isChecked) {
                     $answeredCount++;
+                }
+
+                if (($fieldData['is_required'] ?? false) && !$isChecked) {
+                    $allRequiredAnswered = false;
                 }
 
                 $fields[] = [
@@ -124,43 +132,25 @@ class Show extends Component
                 ];
             }
 
-            if (!isset($phases[$phase])) {
-                $phases[$phase] = [
-                    'label' => $phase,
-                    'sections' => [],
-                    'total_fields' => 0,
-                    'answered_fields' => 0,
-                ];
-            }
-
-            $phases[$phase]['sections'][] = [
+            $sections[] = [
                 'section_id' => $sectionData['section_id'] ?? null,
                 'title' => $sectionData['title'],
                 'description' => $sectionData['description'] ?? null,
+                'phase_label' => $sectionData['phase_label'] ?? 'Allgemein',
                 'fields' => $fields,
                 'total' => count($fields),
                 'answered' => $answeredCount,
             ];
-            $phases[$phase]['total_fields'] += count($fields);
-            $phases[$phase]['answered_fields'] += $answeredCount;
         }
 
-        // Check if all required fields are answered
-        $allRequiredAnswered = true;
-        foreach ($phases as $phase) {
-            foreach ($phase['sections'] as $section) {
-                foreach ($section['fields'] as $field) {
-                    if ($field['is_required'] && !$field['is_checked']) {
-                        $allRequiredAnswered = false;
-                        break 3;
-                    }
-                }
-            }
+        // Clamp activeSection
+        if ($this->activeSection >= count($sections)) {
+            $this->activeSection = max(0, count($sections) - 1);
         }
 
         return view('qm::livewire.instance.show', [
             'stats' => $stats,
-            'phases' => $phases,
+            'sections' => $sections,
             'allRequiredAnswered' => $allRequiredAnswered,
         ])->layout('platform::layouts.app');
     }
