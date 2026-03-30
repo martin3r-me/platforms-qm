@@ -46,6 +46,29 @@ class Create extends Component
         $this->evaluation = $service->evaluateWizard($this->template, $this->answers);
     }
 
+    /**
+     * Toggle a multi_select option value in/out of the answers array.
+     */
+    public function toggleMultiSelect(string $fieldName, string $value): void
+    {
+        if (!isset($this->answers[$fieldName]) || !is_array($this->answers[$fieldName])) {
+            $this->answers[$fieldName] = [];
+        }
+
+        $index = array_search($value, $this->answers[$fieldName]);
+        if ($index !== false) {
+            array_splice($this->answers[$fieldName], $index, 1);
+        } else {
+            $this->answers[$fieldName][] = $value;
+        }
+
+        // Re-index
+        $this->answers[$fieldName] = array_values($this->answers[$fieldName]);
+
+        // Trigger evaluation
+        $this->updatedAnswers();
+    }
+
     public function goToPreview(): void
     {
         $service = new QmWizardService();
