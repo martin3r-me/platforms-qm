@@ -51,12 +51,13 @@
                         @endif
 
                         @if($field['input_type'] === 'single_select' && !empty($field['lookup_table']['entries']))
-                            <x-ui-input-select wire:model.live="answers.{{ $field['technical_name'] }}">
-                                <option value="">-- Bitte waehlen --</option>
-                                @foreach($field['lookup_table']['entries'] as $entry)
-                                <option value="{{ $entry['value'] }}">{{ $entry['label'] }}</option>
-                                @endforeach
-                            </x-ui-input-select>
+                            <x-ui-input-select
+                                name="answers_{{ $field['technical_name'] }}"
+                                wire:model.live="answers.{{ $field['technical_name'] }}"
+                                :options="collect($field['lookup_table']['entries'])->map(fn($e) => ['value' => $e['value'], 'label' => $e['label']])->toArray()"
+                                :nullable="true"
+                                nullLabel="-- Bitte waehlen --"
+                            />
                         @elseif($field['input_type'] === 'multi_select' && !empty($field['lookup_table']['entries']))
                             <div class="space-y-2">
                                 @foreach($field['lookup_table']['entries'] as $entry)
