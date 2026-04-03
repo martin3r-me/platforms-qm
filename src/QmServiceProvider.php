@@ -40,6 +40,7 @@ class QmServiceProvider extends ServiceProvider
             PlatformCore::registerModule([
                 'key' => 'qm',
                 'title' => 'QM',
+                'group' => 'planning',
                 'routing' => config('qm.routing'),
                 'guard' => config('qm.guard'),
                 'navigation' => config('qm.navigation'),
